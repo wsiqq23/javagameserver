@@ -29,11 +29,9 @@ import java.util.List;
  * Decode byte to different types of message
  * @author Winter
  */
-@ChannelHandler.Sharable
 public class MessageDecoder extends ByteToMessageDecoder {
     private final Logger logger = LogManager.getLogger(MessageDecoder.class);
-    public static final MessageDecoder INSTANCE = new MessageDecoder();
-    private MessageDecoder(){}
+    public MessageDecoder(){}
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception{
         byte decoderFlag = byteBuf.readByte();

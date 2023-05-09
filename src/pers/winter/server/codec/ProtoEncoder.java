@@ -25,7 +25,6 @@ import io.netty.handler.codec.MessageToByteEncoder;
  * Message encoder for Protocol Buffers message
  * @author Winter
  */
-
 @ChannelHandler.Sharable
 public class ProtoEncoder extends MessageToByteEncoder<GeneratedMessageV3> {
     public static final ProtoEncoder INSTANCE = new ProtoEncoder();

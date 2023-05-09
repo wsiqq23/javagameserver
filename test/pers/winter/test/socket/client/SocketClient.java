@@ -58,7 +58,7 @@ public class SocketClient {
             protected void initChannel(SocketChannel ch) throws Exception {
                 ch.pipeline().addLast(ProtoEncoder.INSTANCE);
                 ch.pipeline().addLast(JsonEncoder.INSTANCE);
-                ch.pipeline().addLast(MessageDecoder.INSTANCE);
+                ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(SocketClientHandler.INSTANCE);
             }
         });
