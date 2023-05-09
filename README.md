@@ -1,0 +1,3 @@
+# javagameserver
+一个Java实现的网络游戏服务器框架
+详细讲解请见微信公众号：鸡汤烩菜，号码是interestingread
