@@ -17,6 +17,7 @@ package pers.winter.server.codec;
 
 import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +29,7 @@ import java.util.List;
  * Decode byte to different types of message
  * @author Winter
  */
+@ChannelHandler.Sharable
 public class MessageDecoder extends ByteToMessageDecoder {
     private final Logger logger = LogManager.getLogger(MessageDecoder.class);
     public static final MessageDecoder INSTANCE = new MessageDecoder();
