@@ -15,14 +15,18 @@
  */
 package pers.winter.test.socket.client;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class SocketClientHandler extends SimpleChannelInboundHandler {
+    private final Logger logger = LogManager.getLogger(SocketClientHandler.class);
     public static final SocketClientHandler INSTANCE = new SocketClientHandler();
     private SocketClientHandler(){}
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
-        System.out.println("Receive server message:" + o);
+        logger.info("Receive server message: {}",JSON.toJSONString(o));
     }
 }

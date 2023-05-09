@@ -13,22 +13,11 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter;
-
-import pers.winter.server.socket.SocketServer;
-import pers.winter.server.socket.WebSocketServer;
+package pers.winter.server.codec;
 
 /**
- * The main entrance of application
+ * Parent class for all messages
  * @author Winter
  */
-public class Main {
-    private static SocketServer socketServer;
-    private static WebSocketServer webSocketServer;
-    public static void main(String[] args) throws Exception {
-        socketServer = new SocketServer();
-        socketServer.start(7001);
-        webSocketServer = new WebSocketServer();
-        webSocketServer.start(7002);
-    }
+public abstract class AbstractBaseMessage {
 }

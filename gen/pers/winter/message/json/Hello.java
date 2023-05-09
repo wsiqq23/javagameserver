@@ -13,22 +13,11 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter;
+package pers.winter.message.json;
 
-import pers.winter.server.socket.SocketServer;
-import pers.winter.server.socket.WebSocketServer;
+import pers.winter.server.codec.AbstractBaseMessage;
 
-/**
- * The main entrance of application
- * @author Winter
- */
-public class Main {
-    private static SocketServer socketServer;
-    private static WebSocketServer webSocketServer;
-    public static void main(String[] args) throws Exception {
-        socketServer = new SocketServer();
-        socketServer.start(7001);
-        webSocketServer = new WebSocketServer();
-        webSocketServer.start(7002);
-    }
+public class Hello extends AbstractBaseMessage {
+    public long time;
+    public String data;
 }

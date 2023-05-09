@@ -24,7 +24,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.server.codec.MessageEncoder;
+import pers.winter.server.codec.JsonEncoder;
+import pers.winter.server.codec.MessageDecoder;
+import pers.winter.server.codec.ProtoEncoder;
 
 /**
  * A socket server
@@ -44,7 +46,9 @@ public class SocketServer implements IServer {
         b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
-                ch.pipeline().addLast(MessageEncoder.INSTANCE);
+                ch.pipeline().addLast(ProtoEncoder.INSTANCE);
+                ch.pipeline().addLast(JsonEncoder.INSTANCE);
+                ch.pipeline().addLast(MessageDecoder.INSTANCE);
                 ch.pipeline().addLast(SocketServerHandler.INSTANCE);
             }
         });

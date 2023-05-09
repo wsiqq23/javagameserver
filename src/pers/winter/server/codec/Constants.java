@@ -13,22 +13,15 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter;
-
-import pers.winter.server.socket.SocketServer;
-import pers.winter.server.socket.WebSocketServer;
+package pers.winter.server.codec;
 
 /**
- * The main entrance of application
+ * Define some constants used for network
  * @author Winter
  */
-public class Main {
-    private static SocketServer socketServer;
-    private static WebSocketServer webSocketServer;
-    public static void main(String[] args) throws Exception {
-        socketServer = new SocketServer();
-        socketServer.start(7001);
-        webSocketServer = new WebSocketServer();
-        webSocketServer.start(7002);
-    }
+public class Constants {
+    /** Message encode flag for json */
+    public static final byte CODEC_JSON = 1;
+    /** Message encode flag for proto */
+    public static final byte CODEC_PROTO = 2;
 }

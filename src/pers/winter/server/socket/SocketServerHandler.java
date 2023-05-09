@@ -15,13 +15,15 @@
  */
 package pers.winter.server.socket;
 
-import io.netty.buffer.ByteBuf;
+import com.alibaba.fastjson.JSON;
+import com.google.protobuf.GeneratedMessageV3;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pers.winter.server.codec.AbstractBaseMessage;
 
 import java.net.InetSocketAddress;
 
@@ -32,13 +34,12 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
     private SocketServerHandler(){}
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        ByteBuf byteBuf = (ByteBuf) msg;
-        int readableBytes = byteBuf.readableBytes();
-        byte[] bytes = new byte[readableBytes];
-        byteBuf.readBytes(bytes);
-        String message = new String(bytes);
-        logger.info("Receive client message: {}",message);
-        ctx.writeAndFlush("OK");
+        if(msg instanceof AbstractBaseMessage){
+            logger.info("Receive JSON message: "+JSON.toJSONString(msg));
+        } else if(msg instanceof GeneratedMessageV3){
+            logger.info("Receive Proto message: "+msg);
+        }
+        ctx.writeAndFlush(msg);
     }
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {

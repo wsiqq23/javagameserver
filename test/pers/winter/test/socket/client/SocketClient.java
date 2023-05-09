@@ -16,7 +16,6 @@
 package pers.winter.test.socket.client;
 
 import java.net.InetSocketAddress;
-import java.util.Scanner;
 
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.apache.logging.log4j.LogManager;
@@ -27,13 +26,16 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import pers.winter.server.codec.MessageEncoder;
-import pers.winter.test.socket.client.SocketClientHandler;
+import pers.winter.message.json.Bye;
+import pers.winter.message.json.Hello;
+import pers.winter.message.proto.Demo;
+import pers.winter.server.codec.JsonEncoder;
+import pers.winter.server.codec.MessageDecoder;
+import pers.winter.server.codec.ProtoEncoder;
 
 public class SocketClient {
     private Logger log = LogManager.getLogger(SocketClient.class);
@@ -54,7 +56,9 @@ public class SocketClient {
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
-                ch.pipeline().addLast(MessageEncoder.INSTANCE);
+                ch.pipeline().addLast(ProtoEncoder.INSTANCE);
+                ch.pipeline().addLast(JsonEncoder.INSTANCE);
+                ch.pipeline().addLast(MessageDecoder.INSTANCE);
                 ch.pipeline().addLast(SocketClientHandler.INSTANCE);
             }
         });
@@ -69,7 +73,7 @@ public class SocketClient {
         }
     }
 
-    public void send(String msg){
+    public void send(Object msg){
         channel.writeAndFlush(msg);
     }
 
@@ -89,12 +93,21 @@ public class SocketClient {
     public static void main(String[] args) throws Exception {
         SocketClient client = new SocketClient("127.0.0.1",7001);
         client.connect();
-        Scanner scanner = new Scanner(System.in);
-        String nextLine;
-        while(true){
-            nextLine = scanner.nextLine();
-            client.send(nextLine);
-        }
+        Hello hello = new Hello();
+        hello.time = System.currentTimeMillis();
+        hello.data = "How are you?";
+        client.send(hello);
+        Thread.sleep(1000);
+        Bye bye = new Bye();
+        bye.data1 = "Good night!";
+        bye.data2 = "See you tomorrow.";
+        client.send(bye);
+        Thread.sleep(1000);
+        Demo.Hello protoHello = Demo.Hello.newBuilder().setTime(hello.time).setData(hello.data).build();
+        client.send(protoHello);
+        Thread.sleep(1000);
+        Demo.Bye protoBye = Demo.Bye.newBuilder().setData1(bye.data1).setData2(bye.data2).build();
+        client.send(protoBye);
     }
 }
 

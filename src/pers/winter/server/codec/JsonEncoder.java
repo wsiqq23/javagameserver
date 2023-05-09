@@ -15,17 +15,26 @@
  */
 package pers.winter.server.codec;
 
+import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
+/**
+ * Message encoder for JSON message
+ * @author Winter
+ */
 @ChannelHandler.Sharable
-public class MessageEncoder extends MessageToByteEncoder<String> {
-    public static final MessageEncoder INSTANCE = new MessageEncoder();
-    private MessageEncoder(){}
+public class JsonEncoder extends MessageToByteEncoder<AbstractBaseMessage> {
+    public static final JsonEncoder INSTANCE = new JsonEncoder();
+    private JsonEncoder(){}
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, String s, ByteBuf byteBuf) throws Exception {
-        byteBuf.writeBytes(s.getBytes());
+    protected void encode(ChannelHandlerContext channelHandlerContext, AbstractBaseMessage message, ByteBuf byteBuf) throws Exception {
+        byteBuf.writeByte(Constants.CODEC_JSON);
+        String json = JSON.toJSONString(message);
+        int messageID = JsonMessageDictionary.getMessageID(message.getClass());
+        byteBuf.writeInt(messageID);
+        byteBuf.writeBytes(json.getBytes());
     }
 }

@@ -1,0 +1,12 @@
+syntax = "proto3";
+package message.demo;
+option java_package = "pers.winter.message.proto";
+option java_outer_classname = "Demo";
+message Hello {
+  int64 time = 1;
+  string data = 2;
+}
+message Bye{
+  string data1 = 1;
+  string data2 = 2;
+}
