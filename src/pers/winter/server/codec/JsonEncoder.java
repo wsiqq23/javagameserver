@@ -31,10 +31,13 @@ public class JsonEncoder extends MessageToByteEncoder<AbstractBaseMessage> {
     private JsonEncoder(){}
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, AbstractBaseMessage message, ByteBuf byteBuf) throws Exception {
-        byteBuf.writeByte(Constants.CODEC_JSON);
         String json = JSON.toJSONString(message);
+        byte[] data = json.getBytes();
+        int length = Constants.ENCODE_HEADER_LENGTH + data.length;
+        byteBuf.writeInt(length);
+        byteBuf.writeByte(Constants.CODEC_JSON);
         int messageID = JsonMessageDictionary.getMessageID(message.getClass());
         byteBuf.writeInt(messageID);
-        byteBuf.writeBytes(json.getBytes());
+        byteBuf.writeBytes(data);
     }
 }

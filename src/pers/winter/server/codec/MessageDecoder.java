@@ -17,7 +17,6 @@ package pers.winter.server.codec;
 
 import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import org.apache.logging.log4j.LogManager;
@@ -36,8 +35,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception{
         byte decoderFlag = byteBuf.readByte();
         int messageID = byteBuf.readInt();
-        int readableBytes = byteBuf.readableBytes();
-        byte[] bytes = new byte[readableBytes];
+        byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
         Object request = null;
         try{

@@ -16,7 +16,9 @@
 package pers.winter.test.socket.client;
 
 import java.net.InetSocketAddress;
+import java.nio.ByteOrder;
 
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,6 +35,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import pers.winter.message.json.Bye;
 import pers.winter.message.json.Hello;
 import pers.winter.message.proto.Demo;
+import pers.winter.server.codec.Constants;
 import pers.winter.server.codec.JsonEncoder;
 import pers.winter.server.codec.MessageDecoder;
 import pers.winter.server.codec.ProtoEncoder;
@@ -58,6 +61,7 @@ public class SocketClient {
             protected void initChannel(SocketChannel ch) throws Exception {
                 ch.pipeline().addLast(ProtoEncoder.INSTANCE);
                 ch.pipeline().addLast(JsonEncoder.INSTANCE);
+                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN,Constants.MAX_PACKAGE_LENGTH,0,4,0,4,true));
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(SocketClientHandler.INSTANCE);
             }
@@ -97,15 +101,12 @@ public class SocketClient {
         hello.time = System.currentTimeMillis();
         hello.data = "How are you?";
         client.send(hello);
-        Thread.sleep(1000);
         Bye bye = new Bye();
         bye.data1 = "Good night!";
         bye.data2 = "See you tomorrow.";
         client.send(bye);
-        Thread.sleep(1000);
         Demo.Hello protoHello = Demo.Hello.newBuilder().setTime(hello.time).setData(hello.data).build();
         client.send(protoHello);
-        Thread.sleep(1000);
         Demo.Bye protoBye = Demo.Bye.newBuilder().setData1(bye.data1).setData2(bye.data2).build();
         client.send(protoBye);
     }

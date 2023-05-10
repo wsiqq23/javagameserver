@@ -24,4 +24,8 @@ public class Constants {
     public static final byte CODEC_JSON = 1;
     /** Message encode flag for proto */
     public static final byte CODEC_PROTO = 2;
+    /** Length for message package header, a byte for encode flag and an int for message id */
+    public static final int ENCODE_HEADER_LENGTH = Byte.BYTES + Integer.BYTES;
+    /** Max length for each message package */
+    public static final int MAX_PACKAGE_LENGTH = 1024 * 1024;
 }

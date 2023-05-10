@@ -21,6 +21,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.TooLongFrameException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pers.winter.server.codec.AbstractBaseMessage;
@@ -58,10 +59,26 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         Channel channel = ctx.channel();
+        StringBuilder logBuilder = new StringBuilder();
         if (channel != null) {
             InetSocketAddress address = (InetSocketAddress) channel.remoteAddress();
-            logger.warn("Channel exception! IP: {}, port: {}",address.getAddress().getHostAddress(),address.getPort(),cause);
+            logBuilder.append("IP:");
+            logBuilder.append(address.getAddress().getHostAddress());
+            logBuilder.append(". ");
         }
+        if(cause != null ){
+            if(cause instanceof TooLongFrameException) {
+                logBuilder.append("Frame too long!");
+                logger.debug(logBuilder.toString(), cause);
+                return;
+            }
+            if(cause.getMessage() != null && cause.getMessage().contains("Connection reset by peer")){
+                ctx.close();
+                return;
+            }
+        }
+        logBuilder.append("Socket exception!");
+        logger.warn(logBuilder.toString() ,cause);
         ctx.close();
     }
 }

@@ -22,11 +22,15 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pers.winter.server.codec.Constants;
 import pers.winter.server.codec.JsonEncoder;
 import pers.winter.server.codec.MessageDecoder;
 import pers.winter.server.codec.ProtoEncoder;
+
+import java.nio.ByteOrder;
 
 /**
  * A socket server
@@ -48,6 +52,7 @@ public class SocketServer implements IServer {
             protected void initChannel(SocketChannel ch) throws Exception {
                 ch.pipeline().addLast(ProtoEncoder.INSTANCE);
                 ch.pipeline().addLast(JsonEncoder.INSTANCE);
+                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN,Constants.MAX_PACKAGE_LENGTH,0,4,0,4,true));
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(SocketServerHandler.INSTANCE);
             }

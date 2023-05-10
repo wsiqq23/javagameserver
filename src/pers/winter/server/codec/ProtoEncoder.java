@@ -31,9 +31,12 @@ public class ProtoEncoder extends MessageToByteEncoder<GeneratedMessageV3> {
     private ProtoEncoder(){}
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, GeneratedMessageV3 generatedMessageV3, ByteBuf byteBuf) throws Exception {
+        byte[] data = generatedMessageV3.toByteArray();
+        int length = Constants.ENCODE_HEADER_LENGTH + data.length;
+        byteBuf.writeInt(length);
         byteBuf.writeByte(Constants.CODEC_PROTO);
         int messageID = ProtoMessageDictionary.getMessageID(generatedMessageV3);
         byteBuf.writeInt(messageID);
-        byteBuf.writeBytes(generatedMessageV3.toByteArray());
+        byteBuf.writeBytes(data);
     }
 }

@@ -28,6 +28,6 @@ public class SocketClientHandler extends SimpleChannelInboundHandler {
     private SocketClientHandler(){}
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
-        logger.info("Receive server message: {}",JSON.toJSONString(o));
+        logger.info("Receive server message: {}",o.toString());
     }
 }
