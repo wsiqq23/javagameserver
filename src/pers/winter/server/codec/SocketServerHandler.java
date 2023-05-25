@@ -13,18 +13,20 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.server.socket;
+package pers.winter.server.codec;
 
-import com.alibaba.fastjson.JSON;
 import com.google.protobuf.GeneratedMessageV3;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.codec.TooLongFrameException;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.server.codec.AbstractBaseMessage;
+import pers.winter.message.AbstractBaseMessage;
+import pers.winter.message.MessageCenter;
 
 import java.net.InetSocketAddress;
 
@@ -36,11 +38,12 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         if(msg instanceof AbstractBaseMessage){
-            logger.info("Receive JSON message: "+JSON.toJSONString(msg));
+            AbstractBaseMessage baseMessage = (AbstractBaseMessage)msg;
+            baseMessage.setContext(ctx);
+            MessageCenter.INSTANCE.receiveMessage(baseMessage);
         } else if(msg instanceof GeneratedMessageV3){
-            logger.info("Receive Proto message: "+msg);
+            logger.debug("Receive Proto message: {}",msg);
         }
-        ctx.writeAndFlush(msg);
     }
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -53,8 +56,10 @@ public class SocketServerHandler extends ChannelInboundHandlerAdapter {
         logger.debug("Channel inactive! IP: {}, port: {}",address.getAddress().getHostAddress(),address.getPort());
     }
     @Override
-    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-        super.userEventTriggered(ctx, evt);
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
+        if (evt instanceof IdleStateEvent && ((IdleStateEvent) evt).state() == IdleState.READER_IDLE) {
+            ctx.close();
+        }
     }
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {

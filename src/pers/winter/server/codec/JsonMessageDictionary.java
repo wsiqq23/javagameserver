@@ -17,6 +17,7 @@ package pers.winter.server.codec;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import pers.winter.message.AbstractBaseMessage;
 import pers.winter.message.json.Bye;
 import pers.winter.message.json.Hello;
 

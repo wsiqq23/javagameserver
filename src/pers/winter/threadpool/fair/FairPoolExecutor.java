@@ -44,7 +44,7 @@ public class FairPoolExecutor<T> {
      * @param handler Handler to deal with tasks.
      */
     public FairPoolExecutor(String name, IExecutorHandler<T> handler) {
-        this(name, Runtime.getRuntime().availableProcessors(), handler);
+        this(name, 0, handler);
     }
 
     /**
@@ -56,6 +56,9 @@ public class FairPoolExecutor<T> {
     public FairPoolExecutor(String name, int threadSize, IExecutorHandler<T> handler) {
         this.name = name;
         this.handler = handler;
+        if(threadSize == 0){
+            threadSize = Runtime.getRuntime().availableProcessors();
+        }
         threads = new FairPoolThread[threadSize];
         for(int i = 0; i < threadSize;i++){
             threads[i] = new FairPoolThread(String.format("%s-%d",this.name,i),this,this.handler);
@@ -122,7 +125,7 @@ public class FairPoolExecutor<T> {
                     T task = userQueue.takeWork();
                     try{
                         handler.execute(task);
-                    }catch (Exception e){
+                    } catch (Throwable e){
                         handler.exceptionCaught(task,e);
                     } finally {
                         userQueue.endWork();

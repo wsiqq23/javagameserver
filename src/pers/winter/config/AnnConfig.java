@@ -13,11 +13,19 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.server.codec;
+package pers.winter.config;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Parent class for all messages
+ * Annotation for the config class.
  * @author Winter
  */
-public abstract class AbstractBaseMessage {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface AnnConfig {
+    String filePath();
 }

@@ -13,11 +13,24 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.message.json;
+package pers.winter.message;
 
-import pers.winter.message.AbstractBaseMessage;
+import com.alibaba.fastjson.annotation.JSONField;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 
-public class Bye extends AbstractBaseMessage {
-    public String data1;
-    public String data2;
+/**
+ * Parent class for all messages
+ * @author Winter
+ */
+public abstract class AbstractBaseMessage {
+    private transient ChannelHandlerContext context;
+    public void setContext(ChannelHandlerContext context){
+        this.context = context;
+    }
+    public ChannelHandlerContext getContext(){return this.context;}
+    @JSONField(serialize = false)
+    public Channel getChannel(){
+        return context!=null?context.channel():null;
+    }
 }

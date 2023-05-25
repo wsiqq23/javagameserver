@@ -52,6 +52,7 @@ public class FairPoolThread<T> implements Thread.UncaughtExceptionHandler, Runna
      */
     public void interrupt(){
         interrupted = true;
+        this.thread.interrupt();
     }
 
     /**
@@ -69,7 +70,7 @@ public class FairPoolThread<T> implements Thread.UncaughtExceptionHandler, Runna
                 T task = userQueue.takeWork();
                 try{
                     handler.execute(task);
-                }catch (Exception e){
+                }catch (Throwable e){
                     handler.exceptionCaught(task,e);
                 } finally {
                     userQueue.endWork();

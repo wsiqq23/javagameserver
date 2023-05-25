@@ -13,11 +13,24 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.message.json;
+package pers.winter.config;
 
-import pers.winter.message.AbstractBaseMessage;
-
-public class Bye extends AbstractBaseMessage {
-    public String data1;
-    public String data2;
+@AnnConfig(filePath="config/application.properties")
+public class ApplicationConfig {
+    private int socketPort;
+    private int webSocketPort;
+    private short idleStateTime;
+    private short messageThreadPoolCount;
+    public int getSocketPort() {
+        return socketPort;
+    }
+    public int getWebSocketPort() {
+        return webSocketPort;
+    }
+    public short getIdleStateTime(){
+        return idleStateTime;
+    }
+    public short getMessageThreadPoolCount() {
+        return messageThreadPoolCount;
+    }
 }

@@ -31,11 +31,11 @@ import java.util.List;
 public class MessageDecoder extends ByteToMessageDecoder {
     private final Logger logger = LogManager.getLogger(MessageDecoder.class);
     public MessageDecoder(){}
-    @Override
-    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception{
+    public Object decode(ByteBuf byteBuf){
+        int length = byteBuf.readInt();
         byte decoderFlag = byteBuf.readByte();
         int messageID = byteBuf.readInt();
-        byte[] bytes = new byte[byteBuf.readableBytes()];
+        byte[] bytes = new byte[length - Constants.ENCODE_HEADER_LENGTH];
         byteBuf.readBytes(bytes);
         Object request = null;
         try{
@@ -48,6 +48,11 @@ public class MessageDecoder extends ByteToMessageDecoder {
         } catch (Exception e){
             logger.info("Decode message exception!",e);
         }
+        return request;
+    }
+    @Override
+    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception{
+        Object request = decode(byteBuf);
         if(request != null){
             list.add(request);
         }

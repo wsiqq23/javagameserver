@@ -13,20 +13,27 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter;
+package pers.winter.message;
 
-import pers.winter.config.ConfigManager;
-import pers.winter.server.ServerActor;
-import pers.winter.server.ShutdownHook;
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Method;
 
 /**
- * The main entrance of application
+ * Message handler for a message.
+ * getMethodHandle().invoke(getService(), message) will be called when the server receives a message.
  * @author Winter
  */
-public class Main {
-    public static void main(String[] args) throws Throwable {
-        ConfigManager.INSTANCE.init();
-        ServerActor.INSTANCE.start();
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+public class MessageHandler {
+    private final Object service;
+    private final MethodHandle methodHandle;
+    public MessageHandler(Object service, MethodHandle methodHandle){
+        this.service = service;
+        this.methodHandle = methodHandle;
+    }
+    public Object getService(){
+        return service;
+    }
+    public MethodHandle getMethodHandle(){
+        return methodHandle;
     }
 }

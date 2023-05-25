@@ -5,3 +5,5 @@
 log/*
 logs/*
 classes/*
+MANIFEST.MF
+addLicense.py

@@ -15,38 +15,35 @@
  */
 package pers.winter.test.socket.client;
 
-import java.net.InetSocketAddress;
-import java.nio.ByteOrder;
-
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.util.concurrent.DefaultThreadFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.HttpClientCodec;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler;
+import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
+import io.netty.handler.codec.http.websocketx.WebSocketVersion;
+import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketClientCompressionHandler;
+import io.netty.util.concurrent.DefaultThreadFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import pers.winter.message.json.Bye;
 import pers.winter.message.json.Hello;
-import pers.winter.message.proto.Demo;
-import pers.winter.server.codec.Constants;
-import pers.winter.server.codec.JsonEncoder;
-import pers.winter.server.codec.MessageDecoder;
-import pers.winter.server.codec.ProtoEncoder;
+import pers.winter.server.codec.*;
 
-public class SocketClient {
-    private Logger log = LogManager.getLogger(SocketClient.class);
+import java.net.InetSocketAddress;
+import java.net.URI;
+
+public class WebSocketClient {
+    private Logger log = LogManager.getLogger(WebSocketClient.class);
     protected EventLoopGroup workerGroup = null;
     protected Channel channel = null;
     private String ip = null;
     private int port = 0;
-    public SocketClient(String ip, int port) {
+    public WebSocketClient(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
@@ -56,14 +53,19 @@ public class SocketClient {
         bootstrap.group(this.workerGroup);
         bootstrap.channel(NioSocketChannel.class);
         bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000);
+        URI uri = new URI("ws://" + ip + ":" + port+"/");
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
+                ch.pipeline().addLast(new HttpClientCodec());
+                ch.pipeline().addLast(new HttpObjectAggregator(65536));
+                ch.pipeline().addLast(WebSocketClientCompressionHandler.INSTANCE);
+                ch.pipeline().addLast(new WebSocketClientProtocolHandler(uri, WebSocketVersion.V13,null,true,new DefaultHttpHeaders(),65536));
+                ch.pipeline().addLast(WebSocketOutboundHandler.INSTANCE);
                 ch.pipeline().addLast(ProtoEncoder.INSTANCE);
                 ch.pipeline().addLast(JsonEncoder.INSTANCE);
-                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN,Constants.MAX_PACKAGE_LENGTH,0,4,0,0,true));
-                ch.pipeline().addLast(new MessageDecoder());
-                ch.pipeline().addLast(SocketClientHandler.INSTANCE);
+                ch.pipeline().addLast(new WebSocketFrameAggregator(Constants.MAX_PACKAGE_LENGTH));
+                ch.pipeline().addLast(new WebSocketClientHandler());
             }
         });
         // 发起异步连接操作
@@ -81,23 +83,28 @@ public class SocketClient {
         channel.writeAndFlush(msg);
     }
 
-
     public void disconnect() {
         this.workerGroup.shutdownGracefully().syncUninterruptibly();
         log.info("Netty socket closed");
     }
 
     public void reconnect() throws Exception {
+        // 先断开
         this.disconnect();
+        // 再连接
         this.connect();
     }
 
     public static void main(String[] args) throws Exception {
-        SocketClient client = new SocketClient("127.0.0.1",7001);
+        WebSocketClient client = new WebSocketClient("127.0.0.1",7002);
         client.connect();
         Hello hello = new Hello();
         hello.time = System.currentTimeMillis();
-        hello.data = "How are you?";
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0;i<100000;i++){
+            sb.append("OKda");
+        }
+        hello.data = sb.toString();
         client.send(hello);
         Bye bye = new Bye();
         bye.data1 = "Good night!";
@@ -105,4 +112,3 @@ public class SocketClient {
         client.send(bye);
     }
 }
-

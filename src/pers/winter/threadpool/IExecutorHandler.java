@@ -25,7 +25,7 @@ public interface IExecutorHandler<T> {
      * The thread pool will call execute when deal with a task
      * @param task Current task.
      */
-    public void execute(T task) throws Exception;
+    public void execute(T task) throws Throwable;
 
     /**
      * If thread pool gets an exception while calling {@link IExecutorHandler#execute(Object)}, it will call this method to deal with the exception.

@@ -23,14 +23,15 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.server.codec.Constants;
-import pers.winter.server.codec.JsonEncoder;
-import pers.winter.server.codec.MessageDecoder;
-import pers.winter.server.codec.ProtoEncoder;
+import pers.winter.config.ApplicationConfig;
+import pers.winter.config.ConfigManager;
+import pers.winter.server.codec.*;
 
 import java.nio.ByteOrder;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A socket server
@@ -47,12 +48,14 @@ public class SocketServer implements IServer {
         ServerBootstrap b = new ServerBootstrap();
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup();
+        short readerIdleTime = ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getIdleStateTime();
         b.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class).childHandler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
+                ch.pipeline().addLast(new IdleStateHandler(readerIdleTime, 0, 0, TimeUnit.SECONDS));
                 ch.pipeline().addLast(ProtoEncoder.INSTANCE);
                 ch.pipeline().addLast(JsonEncoder.INSTANCE);
-                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN,Constants.MAX_PACKAGE_LENGTH,0,4,0,4,true));
+                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN,Constants.MAX_PACKAGE_LENGTH,0,4,0,0,true));
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(SocketServerHandler.INSTANCE);
             }

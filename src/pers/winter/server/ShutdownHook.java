@@ -13,11 +13,18 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.message.json;
+package pers.winter.server;
 
-import pers.winter.message.AbstractBaseMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class Bye extends AbstractBaseMessage {
-    public String data1;
-    public String data2;
+public class ShutdownHook extends Thread{
+    private Logger logger = LogManager.getLogger(ShutdownHook.class);
+
+    @Override
+    public void run() {
+        logger.warn("Shutdown Start!");
+        ServerActor.INSTANCE.terminate();
+        logger.warn("Shutdown Over!");
+    }
 }

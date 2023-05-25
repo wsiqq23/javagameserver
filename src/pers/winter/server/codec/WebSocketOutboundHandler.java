@@ -13,21 +13,23 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.test.socket.client;
+package pers.winter.server.codec;
 
-import com.alibaba.fastjson.JSON;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
+
 @ChannelHandler.Sharable
-public class SocketClientHandler extends SimpleChannelInboundHandler {
-    private final Logger logger = LogManager.getLogger(SocketClientHandler.class);
-    public static final SocketClientHandler INSTANCE = new SocketClientHandler();
-    private SocketClientHandler(){}
-    @Override
-    protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
-        logger.info("Receive server message: {}",JSON.toJSONString(o));
+public class WebSocketOutboundHandler extends ChannelOutboundHandlerAdapter {
+    public static final WebSocketOutboundHandler INSTANCE = new WebSocketOutboundHandler();
+    private WebSocketOutboundHandler(){}
+    public void write(ChannelHandlerContext channelHandlerContext, Object msg, ChannelPromise promise) throws Exception {
+        if(msg instanceof ByteBuf){
+            msg = new BinaryWebSocketFrame((ByteBuf) msg);
+        }
+        super.write(channelHandlerContext,msg,promise);
     }
 }

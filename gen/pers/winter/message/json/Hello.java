@@ -15,7 +15,7 @@
  */
 package pers.winter.message.json;
 
-import pers.winter.server.codec.AbstractBaseMessage;
+import pers.winter.message.AbstractBaseMessage;
 
 public class Hello extends AbstractBaseMessage {
     public long time;
