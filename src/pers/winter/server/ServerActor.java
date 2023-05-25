@@ -40,7 +40,11 @@ public class ServerActor {
 
     public void terminate() {
         MessageCenter.INSTANCE.terminate();
-        socketServer.stop();
-        webSocketServer.stop();
+        if(socketServer != null){
+            socketServer.stop();
+        }
+        if(webSocketServer != null) {
+            webSocketServer.stop();
+        }
     }
 }
