@@ -21,6 +21,8 @@ public class ApplicationConfig {
     private int webSocketPort;
     private short idleStateTime;
     private short messageThreadPoolCount;
+    private short databaseThreadPoolCount;
+    private long nodeID;
     public int getSocketPort() {
         return socketPort;
     }
@@ -33,4 +35,6 @@ public class ApplicationConfig {
     public short getMessageThreadPoolCount() {
         return messageThreadPoolCount;
     }
+    public short getDatabaseThreadPoolCount(){return databaseThreadPoolCount;}
+    public long getNodeID(){return nodeID;}
 }

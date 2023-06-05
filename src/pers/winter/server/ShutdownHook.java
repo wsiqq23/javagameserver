@@ -19,7 +19,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ShutdownHook extends Thread{
-    private Logger logger = LogManager.getLogger(ShutdownHook.class);
+    private static final Logger logger = LogManager.getLogger(ShutdownHook.class);
 
     @Override
     public void run() {

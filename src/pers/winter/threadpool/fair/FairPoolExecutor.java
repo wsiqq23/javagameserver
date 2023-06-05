@@ -53,6 +53,7 @@ public class FairPoolExecutor<T> {
      * @param threadSize Count of threads created.
      * @param handler Handler to deal with tasks.
      */
+    @SuppressWarnings("unchecked")
     public FairPoolExecutor(String name, int threadSize, IExecutorHandler<T> handler) {
         this.name = name;
         this.handler = handler;
@@ -172,7 +173,7 @@ public class FairPoolExecutor<T> {
         return taskSchedule.take();
     }
 
-    protected void scheduleWork(FairPoolUserQueue userQueue){
+    protected void scheduleWork(FairPoolUserQueue<T> userQueue){
         taskSchedule.add(userQueue);
     }
 

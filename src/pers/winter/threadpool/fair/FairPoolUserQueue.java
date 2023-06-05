@@ -52,6 +52,7 @@ public class FairPoolUserQueue<T> {
     /**
      * Add a new task into the queue
      */
+    @SuppressWarnings("unchecked")
     public void addWork(T task){
         lock.lock();
         try{
@@ -69,6 +70,7 @@ public class FairPoolUserQueue<T> {
     /**
      * Notify the queue when the worker thread completes the previous work.
      */
+    @SuppressWarnings("unchecked")
     public void endWork(){
         lock.lock();
         try{

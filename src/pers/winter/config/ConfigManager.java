@@ -37,10 +37,9 @@ public class ConfigManager {
     /**
      * Get a config data by config class
      * @param cls the class of the config class
-     * @param <T>
-     * @return
      * @throws IllegalArgumentException cannot load a config not annotated with the Annotation "AnnConfig"
      */
+    @SuppressWarnings("unchecked")
     public <T> T getConfig(Class<T> cls) throws IllegalArgumentException {
         if (!cls.isAnnotationPresent(AnnConfig.class)) {
             throw new IllegalArgumentException("Class not annotated by AnnConfig");
@@ -66,6 +65,7 @@ public class ConfigManager {
         InputStream is = ConfigManager.class.getClassLoader().getResourceAsStream(annConfig.filePath());
         Properties properties = new Properties();
         properties.load(is);
+        is.close();
         Field[] fields = config.getClass().getDeclaredFields();
         for (int i = 0; i < fields.length; i++) {
             Field field = fields[i];

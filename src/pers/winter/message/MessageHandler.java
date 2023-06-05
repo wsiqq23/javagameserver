@@ -16,7 +16,6 @@
 package pers.winter.message;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Method;
 
 /**
  * Message handler for a message.

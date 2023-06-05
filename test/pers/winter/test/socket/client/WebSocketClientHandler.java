@@ -43,16 +43,4 @@ public class WebSocketClientHandler extends SimpleChannelInboundHandler<WebSocke
             }
         }
     }
-
-//    @Override
-//    public void userEventTriggered(ChannelHandlerContext channelHandlerContext, Object event){
-//        super.userEventTriggered(channelHandlerContext, event);
-//        if (event instanceof WebSocketClientProtocolHandler.ClientHandshakeStateEvent) {
-//            WebSocketClientProtocolHandler.ClientHandshakeStateEvent handshakeEvt = (WebSocketClientProtocolHandler.ClientHandshakeStateEvent) evt;
-//            if (handshakeEvt.equals(WebSocketClientProtocolHandler.ClientHandshakeStateEvent.HANDSHAKE_COMPLETE)) {
-//                handshakerPromise.setSuccess();
-//            }
-//        }
-//    }
-//
 }

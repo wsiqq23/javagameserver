@@ -16,6 +16,7 @@
 package pers.winter;
 
 import pers.winter.config.ConfigManager;
+import pers.winter.db.DatabaseCenter;
 import pers.winter.server.ServerActor;
 import pers.winter.server.ShutdownHook;
 
@@ -26,6 +27,7 @@ import pers.winter.server.ShutdownHook;
 public class Main {
     public static void main(String[] args) throws Throwable {
         ConfigManager.INSTANCE.init();
+        DatabaseCenter.INSTANCE.init();
         ServerActor.INSTANCE.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
     }

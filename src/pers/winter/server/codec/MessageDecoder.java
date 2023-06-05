@@ -48,6 +48,7 @@ public class MessageDecoder extends ByteToMessageDecoder {
         } catch (Exception e){
             logger.info("Decode message exception!",e);
         }
+        logger.debug("Receive message: {}", request.getClass());
         return request;
     }
     @Override

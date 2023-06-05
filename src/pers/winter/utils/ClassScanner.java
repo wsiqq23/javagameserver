@@ -141,7 +141,7 @@ public class ClassScanner {
         jarFile.close();
         return result;
     }
-    private static List<Class<?>> getClassesFromFileRecursively(File file, String rootDirectory) throws IOException {
+    private static List<Class<?>> getClassesFromFileRecursively(File file, String rootDirectory) {
         List<Class<?>> result = new ArrayList<>();
         if(file.isDirectory()){
             File[] files = file.listFiles();

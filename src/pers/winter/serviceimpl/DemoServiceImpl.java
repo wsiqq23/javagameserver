@@ -23,8 +23,8 @@ import pers.winter.message.json.Bye;
 import pers.winter.message.json.Hello;
 
 @AnnMessageServiceImpl
-public class DemoServiceIml {
-    private static final Logger logger = LogManager.getLogger(DemoServiceIml.class);
+public class DemoServiceImpl {
+    private static final Logger logger = LogManager.getLogger(DemoServiceImpl.class);
     public void hello(Hello request){
         logger.info("Receive Hello: {}", JSON.toJSONString(request));
         Hello response = new Hello();
