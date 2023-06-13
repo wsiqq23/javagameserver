@@ -17,6 +17,7 @@ package pers.winter.server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pers.winter.db.DatabaseCenter;
 
 public class ShutdownHook extends Thread{
     private static final Logger logger = LogManager.getLogger(ShutdownHook.class);
@@ -25,6 +26,7 @@ public class ShutdownHook extends Thread{
     public void run() {
         logger.warn("Shutdown Start!");
         ServerActor.INSTANCE.terminate();
+        DatabaseCenter.INSTANCE.terminate();
         logger.warn("Shutdown Over!");
     }
 }

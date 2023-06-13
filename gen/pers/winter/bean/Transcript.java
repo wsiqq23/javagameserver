@@ -2,8 +2,9 @@ package pers.winter.bean;
 
 import org.bson.Document;
 import pers.winter.db.mongo.ISerializableMongoObject;
+import pers.winter.entity.ICloneable;
 
-public class Transcript implements ISerializableMongoObject {
+public class Transcript implements ISerializableMongoObject, ICloneable {
     private short math;
     private short english;
     private short chinese;
@@ -46,5 +47,14 @@ public class Transcript implements ISerializableMongoObject {
         document.put("english", this.getEnglish());
         document.put("chinese", this.getChinese());
         return document;
+    }
+
+    @Override
+    public Transcript deepClone(){
+        Transcript transcript = new Transcript();
+        transcript.setMath(getMath());
+        transcript.setEnglish(getEnglish());
+        transcript.setChinese(getChinese());
+        return transcript;
     }
 }

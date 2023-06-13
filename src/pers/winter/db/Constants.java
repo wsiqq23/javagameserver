@@ -4,6 +4,9 @@ public class Constants {
     public enum DBType{
         MONGO,MYSQL
     }
+    public enum CacheType{
+        REDIS,MEMORY
+    }
     /**
      * Enumeration of the entity's actions.
      * delete, insert and update

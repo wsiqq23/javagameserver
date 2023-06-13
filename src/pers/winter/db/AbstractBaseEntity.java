@@ -1,7 +1,9 @@
 package pers.winter.db;
 
 import org.bson.Document;
+import pers.winter.cache.thread.ThreadCacheManager;
 import pers.winter.db.mongo.ISerializableMongoObject;
+import pers.winter.entity.ICloneable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,7 +12,7 @@ import java.sql.SQLException;
 /**
  * The superclass for all database entities
  */
-public abstract class AbstractBaseEntity implements ISerializableMongoObject {
+public abstract class AbstractBaseEntity implements ISerializableMongoObject, ICloneable {
     private long id;
     private int entityVersion = 0;
     private transient Constants.Action action;
@@ -55,6 +57,7 @@ public abstract class AbstractBaseEntity implements ISerializableMongoObject {
             return;
         }
         this.action = action;
+        ThreadCacheManager.INSTANCE.entityChanges(this);
     }
 
     public void update(){

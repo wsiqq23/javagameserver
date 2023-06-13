@@ -12,7 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@AnnTable(key = "dormitory", dbType = Constants.DBType.MYSQL, daoClass = StudentDao.class)
+@AnnTable(key = "dormitory", dbType = Constants.DBType.MYSQL, daoClass = StudentDao.class, cacheType = Constants.CacheType.MEMORY,userCache = true)
 public class Student extends AbstractBaseEntity {
     private short sex;
     private String name;
@@ -67,7 +67,7 @@ public class Student extends AbstractBaseEntity {
 
     @Override
     public long getKeyID() {
-        return dormitory;
+        return getDormitory();
     }
 
     @Override
@@ -119,5 +119,18 @@ public class Student extends AbstractBaseEntity {
         stat.setLong(5, this.getBirthday());
         stat.setLong(6, this.getDormitory());
         stat.setString(7, JSON.toJSONString(this.getTranscript()));
+    }
+
+    @Override
+    public Student deepClone(){
+        Student student = new Student();
+        student.setId(getId());
+        student.setEntityVersion(getEntityVersion());
+        student.setSex(getSex());
+        student.setName(getName());
+        student.setBirthday(getBirthday());
+        student.setDormitory(getDormitory());
+        student.setTranscript(getTranscript() == null?null:getTranscript().deepClone());
+        return student;
     }
 }

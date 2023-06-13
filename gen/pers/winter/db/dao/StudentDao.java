@@ -50,13 +50,12 @@ public class StudentDao extends AbstractBaseDao {
 
     @Override
     public boolean update(Connection connection, AbstractBaseEntity entity) throws SQLException {
-        String sql = String.format(SQL_UPDATE,TABLE_NAME,"id=?,entityVersion=?,sex=?,name=?,birthday=?,dormitory=?,transcript=? where id=? and entityVersion<?");
+        String sql = String.format(SQL_UPDATE,TABLE_NAME,"id=?,entityVersion=?,sex=?,name=?,birthday=?,dormitory=?,transcript=? where id=?");
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(sql);
             entity.toPreparedStatement(preparedStatement);
             preparedStatement.setLong(8,entity.getId());
-            preparedStatement.setLong(9,entity.getEntityVersion());
             if (preparedStatement.executeUpdate() == 1) {
                 return true;
             }
@@ -66,31 +65,6 @@ public class StudentDao extends AbstractBaseDao {
             }
         }
         return false;
-    }
-
-    @Override
-    public Student select(Connection connection, long id) throws SQLException {
-        String sql = String.format(SQL_SELECT,TABLE_NAME);
-        PreparedStatement preparedStatement = null;
-        ResultSet resultSet = null;
-        Student entity = null;
-        try{
-            preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setLong(1,id);
-            resultSet = preparedStatement.executeQuery();
-            if(resultSet.next()){
-                entity = new Student();
-                entity.fromResultSet(resultSet);
-            }
-        } finally {
-            if(resultSet != null){
-                resultSet.close();
-            }
-            if(preparedStatement != null){
-                preparedStatement.close();
-            }
-        }
-        return entity;
     }
 
     @Override

@@ -46,25 +46,6 @@ public class MongoConnector extends AbstractConnector {
         collection.insertOne(entity.toDocument());
     }
     @Override
-    public <T extends AbstractBaseEntity> T select(long id,Class<T> cls) throws Exception {
-        MongoDatabase database = client.getDatabase(databaseName);
-        MongoCollection<Document> collection = database.getCollection(cls.getSimpleName());
-        FindIterable<Document> documents = collection.find(Filters.eq("id",id));
-        MongoCursor<Document> iterator = documents.iterator();
-        if(iterator.hasNext()){
-            Document document = iterator.next();
-            try{
-                T object = cls.getDeclaredConstructor().newInstance();
-                object.fromDocument(document);
-                return object;
-            } catch (Exception e) {
-                logger.error("Select from Mongo Exception!",e);
-                return null;
-            }
-        }
-        return null;
-    }
-    @Override
     public <T extends AbstractBaseEntity> List<T> selectByKey(long keyID,Class<T> cls) throws Exception{
         MongoDatabase database = client.getDatabase(databaseName);
         MongoCollection<Document> collection = database.getCollection(cls.getSimpleName());
@@ -126,7 +107,7 @@ public class MongoConnector extends AbstractConnector {
     public void update(AbstractBaseEntity entity) {
         MongoDatabase database = client.getDatabase(databaseName);
         MongoCollection<Document> collection = database.getCollection(entity.getClass().getSimpleName());
-        Bson condition = Filters.and(Filters.eq("id",entity.getId()),Filters.lt("entityVersion",entity.getEntityVersion()));
+        Bson condition = Filters.and(Filters.eq("id",entity.getId()));
         Document update = entity.toDocument();
         collection.replaceOne(condition,update);
     }

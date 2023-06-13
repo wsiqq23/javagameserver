@@ -21,6 +21,7 @@ public class DatabaseCenter {
     private MySqlConnector mySqlConnector;
     private MongoConnector mongoConnector;
     private FairPoolExecutor<AbstractBaseEntity> executor;
+    private boolean terminated = false;
     private DatabaseCenter(){}
 
     public void init() throws Exception{
@@ -28,6 +29,11 @@ public class DatabaseCenter {
         mySqlConnector = new MySqlConnector();
         mongoConnector = new MongoConnector();
         startExecutor();
+    }
+
+    public void terminate(){
+        terminated = true;
+        this.executor.terminate(false);
     }
 
     private void startExecutor(){
@@ -67,11 +73,6 @@ public class DatabaseCenter {
         }
     }
 
-    public <T extends AbstractBaseEntity> T select(long id, Class<T> entityClass) throws Exception{
-        AbstractConnector connector = getConnector(entityClass);
-        return connector.select(id,entityClass);
-    }
-
     public <T extends AbstractBaseEntity> List<T> selectByKey(long id, Class<T> entityClass) throws Exception{
         AbstractConnector connector = getConnector(entityClass);
         return connector.selectByKey(id,entityClass);
@@ -87,8 +88,10 @@ public class DatabaseCenter {
     }
 
     public void save(Set<AbstractBaseEntity> entities){
-        for(AbstractBaseEntity entity:entities){
-            executor.add(entity.getKeyID(),entity);
+        if(!terminated){
+            for(AbstractBaseEntity entity:entities){
+                executor.add(entity.getKeyID(),entity);
+            }
         }
     }
 }

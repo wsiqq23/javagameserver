@@ -23,6 +23,7 @@ public class ApplicationConfig {
     private short messageThreadPoolCount;
     private short databaseThreadPoolCount;
     private long nodeID;
+    private int cacheExpire;
     public int getSocketPort() {
         return socketPort;
     }
@@ -37,4 +38,5 @@ public class ApplicationConfig {
     }
     public short getDatabaseThreadPoolCount(){return databaseThreadPoolCount;}
     public long getNodeID(){return nodeID;}
+    public int getCacheExpire(){return cacheExpire;}
 }

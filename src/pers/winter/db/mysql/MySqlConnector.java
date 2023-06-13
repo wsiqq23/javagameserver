@@ -104,25 +104,6 @@ public class MySqlConnector extends AbstractConnector {
     }
 
     @Override
-    public <T extends AbstractBaseEntity> T select(long id, Class<T> cls) throws Exception {
-        int dbID = shardingStrategy.getShardingByID(id);
-        DataSource dataSource = this.sourceMap.get(dbID);
-        if(dataSource == null){
-            throw new RuntimeException("No data source for id: " + id);
-        }
-        Connection connection = null;
-        try{
-            connection = dataSource.getConnection();
-            AbstractBaseDao dao = daoMap.get(cls);
-            return dao.select(connection,id);
-        } finally {
-            if(connection != null){
-                connection.close();
-            }
-        }
-    }
-
-    @Override
     public <T extends AbstractBaseEntity> List<T> selectByKey(long keyID, Class<T> cls) throws Exception {
         int dbID = shardingStrategy.getShardingByID(keyID);
         DataSource dataSource = this.sourceMap.get(dbID);

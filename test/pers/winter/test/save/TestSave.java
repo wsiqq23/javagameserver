@@ -1,15 +1,17 @@
 package pers.winter.test.save;
 
+import com.alibaba.fastjson.JSON;
 import pers.winter.bean.Transcript;
+import pers.winter.cache.thread.ThreadCacheManager;
 import pers.winter.config.ConfigManager;
 import pers.winter.db.AbstractBaseEntity;
-import pers.winter.db.DatabaseCenter;
 import pers.winter.db.entity.Student;
 import pers.winter.entity.EntityManager;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 public class TestSave {
     private static void testInsert(){
@@ -24,36 +26,63 @@ public class TestSave {
             student.insert();
             insertSet.add(student);
         }
-        EntityManager.INSTANCE.save(insertSet);
+        boolean result = EntityManager.INSTANCE.save(insertSet);
+        System.out.println("insert:"+result);
     }
-    private static void testUpdateAndDelete(List<Student> students){
+    private static boolean testUpdate() throws Exception {
+        List<Student> students = EntityManager.INSTANCE.selectByKey(1, Student.class);
         Set<AbstractBaseEntity> set = new HashSet<>();
         for(int i = 0;i<students.size();i++){
             Student student = students.get(i);
+            student.setName(Thread.currentThread().getName());
             if(student.getTranscript() == null){
                 student.setTranscript(new Transcript());
             }
             student.getTranscript().setChinese((short) 100);
             student.getTranscript().setMath((short) 100);
             student.getTranscript().setEnglish((short) 100);
-            if(i%2==0){
-                student.update();
-            } else {
-                student.delete();
-            }
+            student.update();
             set.add(student);
         }
-        EntityManager.INSTANCE.save(set);
+        return EntityManager.INSTANCE.save(set);
     }
+
+    private static boolean testDelete() throws Exception{
+        List<Student> students = EntityManager.INSTANCE.selectByKey(1, Student.class);
+        Set<AbstractBaseEntity> set = new HashSet<>();
+        for(int i = 0;i<students.size();i++){
+            Student student = students.get(i);
+            student.delete();
+            set.add(student);
+        }
+        return EntityManager.INSTANCE.save(set);
+    }
+
     public static void main(String[] args) throws Throwable {
         ConfigManager.INSTANCE.init();
-        DatabaseCenter.INSTANCE.init();
+        EntityManager.INSTANCE.init();
         List<Student> students = EntityManager.INSTANCE.selectByKey(1,Student.class);
-        if(students.isEmpty()){
+        if(students.isEmpty()) {
             testInsert();
-            Thread.sleep(3000);
-            students = EntityManager.INSTANCE.selectByKey(1,Student.class);
         }
-        testUpdateAndDelete(students);
+        final int threadSize = 10;
+        CountDownLatch cd = new CountDownLatch(threadSize);
+        for(int i = 0;i<threadSize;i++){
+            Thread t = new Thread(()->{
+                try {
+                    boolean result = false;
+                    while(result == false){
+                        result = testUpdate();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(-1);
+                }
+                cd.countDown();
+            });
+            t.setName("Thread"+i);
+            t.start();
+        }
+        cd.await();
     }
 }

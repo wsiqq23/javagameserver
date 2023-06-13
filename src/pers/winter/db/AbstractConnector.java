@@ -16,15 +16,6 @@ public abstract class AbstractConnector {
      */
     public abstract void insert(AbstractBaseEntity entity) throws Exception;
     /**
-     * Selects an entity from the database based on the specified ID and class.
-     * @param id the unique ID of the entity to be selected
-     * @param cls the class of the entity
-     * @param <T> the type of the entity
-     * @return the selected entity
-     * @throws Exception if an error occurs during selection
-     */
-    public abstract <T extends AbstractBaseEntity> T select(long id,Class<T> cls) throws Exception;
-    /**
      * Selects all entities from the database matching the specified key ID and class.
      * @param keyID the key ID for selection
      * @param cls the class of the entities
