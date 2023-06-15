@@ -18,15 +18,41 @@ package pers.winter.serviceimpl;
 import com.alibaba.fastjson.JSON;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pers.winter.db.entity.Student;
+import pers.winter.entity.EntityManager;
+import pers.winter.message.AnnMessageMethod;
 import pers.winter.message.AnnMessageServiceImpl;
 import pers.winter.message.json.Bye;
 import pers.winter.message.json.Hello;
 
+import java.util.List;
+
 @AnnMessageServiceImpl
 public class DemoServiceImpl {
     private static final Logger logger = LogManager.getLogger(DemoServiceImpl.class);
+    @AnnMessageMethod(retryCount = 10)
     public void hello(Hello request){
         logger.info("Receive Hello: {}", JSON.toJSONString(request));
+        try{
+            long keyID = 323;
+            List<Student> students = EntityManager.INSTANCE.selectByKey(keyID,Student.class);
+            if(students.isEmpty()) {
+                for(int i = 0;i<10;i++){
+                    Student student = new Student();
+                    student.setDormitory(keyID);
+                    student.setName("Student"+i);
+                    student.setSex((short) i);
+                    student.insert();
+                }
+            }
+            students = EntityManager.INSTANCE.selectByKey(keyID,Student.class);
+            for(Student student:students){
+                student.setBirthday(1);
+                student.update();
+            }
+        } catch (Exception e){
+            logger.error("Exception while calling hello.",e);
+        }
         Hello response = new Hello();
         response.data = "Fine, thank you, and you?";
         response.time = System.currentTimeMillis();

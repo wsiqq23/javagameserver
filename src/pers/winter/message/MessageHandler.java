@@ -25,9 +25,11 @@ import java.lang.invoke.MethodHandle;
 public class MessageHandler {
     private final Object service;
     private final MethodHandle methodHandle;
-    public MessageHandler(Object service, MethodHandle methodHandle){
+    private final int retryCount;
+    public MessageHandler(Object service, MethodHandle methodHandle, int retryCount){
         this.service = service;
         this.methodHandle = methodHandle;
+        this.retryCount = retryCount;
     }
     public Object getService(){
         return service;
@@ -35,4 +37,5 @@ public class MessageHandler {
     public MethodHandle getMethodHandle(){
         return methodHandle;
     }
+    public int getRetryCount(){return retryCount;}
 }

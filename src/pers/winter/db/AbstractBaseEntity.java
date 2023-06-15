@@ -67,7 +67,7 @@ public abstract class AbstractBaseEntity implements ISerializableMongoObject, IC
      * Entity's action: insert or delete or update
      * Priority: delete > insert > update
      */
-    public void setAction(Constants.Action action) {
+    private void setAction(Constants.Action action) {
         if(this.action != null && this.action.toNumber() < action.toNumber()){
             return;
         }

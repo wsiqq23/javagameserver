@@ -20,6 +20,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pers.winter.config.ApplicationConfig;
 import pers.winter.config.ConfigManager;
+import pers.winter.entity.Transaction;
+import pers.winter.message.json.ActionFail;
 import pers.winter.threadpool.IExecutorHandler;
 import pers.winter.threadpool.fair.FairPoolExecutor;
 import pers.winter.utils.ClassScanner;
@@ -32,6 +34,8 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Message center of the server, manage all actions about message.
@@ -45,6 +49,7 @@ public class MessageCenter {
     private IExecutorHandler<AbstractBaseMessage> executorHandler;
     private FairPoolExecutor<AbstractBaseMessage> executor;
     private boolean terminated = false;
+    private ConcurrentHashMap<Thread,MessageTransaction> transactionPool;
 
     /**
      * Scan all classes in the project and init the handler for every message.
@@ -55,6 +60,7 @@ public class MessageCenter {
      */
     public void start() throws Exception {
         initMessageHandler();
+        initTransactionPool();
         startExecutor();
     }
 
@@ -78,12 +84,21 @@ public class MessageCenter {
                             Constructor<?> defaultConstructor = handlerClass.getConstructor();
                             handler = defaultConstructor.newInstance();
                         }
+                        int retryCount = 0;
+                        AnnMessageMethod annMethod = method.getAnnotation(AnnMessageMethod.class);
+                        if(annMethod != null){
+                            retryCount = annMethod.retryCount();
+                        }
                         MethodHandle methodHandle = MethodHandles.publicLookup().unreflect(method);
-                        messageHandlers.put(parameterCls,new MessageHandler(handler,methodHandle));
+                        messageHandlers.put(parameterCls,new MessageHandler(handler,methodHandle,retryCount));
                     }
                 }
             }
         }
+    }
+    private void initTransactionPool(){
+        short threadCount = ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getMessageThreadPoolCount();
+        transactionPool = new ConcurrentHashMap<>(threadCount);
     }
     private void startExecutor(){
         this.executorHandler = new IExecutorHandler<AbstractBaseMessage>() {
@@ -91,9 +106,18 @@ public class MessageCenter {
             public void execute(AbstractBaseMessage task) throws Throwable {
                 MessageHandler messageHandler = messageHandlers.get(task.getClass());
                 if(messageHandler == null){
-                    throw new UnsupportedOperationException("Message handler not found!");
+                    logger.error("Message handler not found for {}", task.getClass().getSimpleName());
+                    return;
                 }
-                messageHandler.getMethodHandle().invoke(messageHandler.getService(), task);
+                MessageTransaction transaction = transactionPool.get(Thread.currentThread());
+                if(transaction == null){
+                    transaction = new MessageTransaction("MessageExecutor");
+                    transactionPool.put(Thread.currentThread(),transaction);
+                }
+                transaction.message = task;
+                transaction.handler = messageHandler;
+                transaction.setRetryCount(messageHandler.getRetryCount());
+                transaction.run();
             }
             @Override
             public void exceptionCaught(AbstractBaseMessage task, Throwable cause) {
@@ -113,6 +137,28 @@ public class MessageCenter {
         if(!terminated){
             InetSocketAddress address = (InetSocketAddress) message.getChannel().remoteAddress();
             executor.add(address.getAddress().getHostAddress(),message);
+        }
+    }
+
+    private static class MessageTransaction extends Transaction{
+        private AbstractBaseMessage message;
+        private MessageHandler handler;
+        public MessageTransaction(String name) {
+            super(name);
+        }
+        @Override
+        protected void process() {
+            try{
+                handler.getMethodHandle().invoke(handler.getService(),message);
+            } catch (Throwable e){
+                logger.error("Execute message {} exception! Data: {}.", message.getClass().getSimpleName(), JSON.toJSONString(message),e);
+            }
+        }
+        @Override
+        protected void failed() {
+            if(message.getChannel() != null && message.getChannel().isActive()){
+                message.getChannel().writeAndFlush(new ActionFail());
+            }
         }
     }
 }

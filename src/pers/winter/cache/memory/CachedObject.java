@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class CachedObject {
     private boolean dataInit = false;
     private final Lock lock = new ReentrantLock();
-    private final Map<Long, AbstractBaseEntity> entities = new HashMap<>();
+    private final Map<Long, AbstractBaseEntity> entities = new ConcurrentHashMap<>();
     private final Map<Long, Object> entityLocks = new ConcurrentHashMap<>();
     public boolean isDataInit() {
         return dataInit;

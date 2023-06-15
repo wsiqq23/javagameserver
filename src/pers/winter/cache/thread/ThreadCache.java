@@ -56,8 +56,35 @@ public class ThreadCache {
             }
         }
     }
-    public void entityChanges(AbstractBaseEntity entity){
+    @SuppressWarnings("unchecked")
+    public <T extends AbstractBaseEntity> void entityChanges(T entity){
         entitiesChanged.add(entity);
+        Map<Long, List<? extends AbstractBaseEntity>> entityMap;
+        List<T> keyList;
+        switch (entity.getAction()) {
+            case DELETE:
+                entityMap = cache.get(entity.getClass());
+                if (entityMap != null) {
+                    keyList = (List<T>) entityMap.get(entity.getKeyID());
+                    if (keyList != null) {
+                        keyList.remove(entity);
+                    }
+                }
+                break;
+            case INSERT:
+                entityMap = cache.get(entity.getClass());
+                if (entityMap == null) {
+                    entityMap = new HashMap<>();
+                    cache.put(entity.getClass(),entityMap);
+                }
+                keyList = (List<T>) entityMap.get(entity.getKeyID());
+                if (keyList == null) {
+                    keyList = new ArrayList<>();
+                    entityMap.put(entity.getKeyID(),keyList);
+                }
+                keyList.add(entity);
+                break;
+        }
     }
     public Set<AbstractBaseEntity> getEntitiesChanged(){
         return entitiesChanged;

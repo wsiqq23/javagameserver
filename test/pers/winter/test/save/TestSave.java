@@ -22,6 +22,7 @@ import pers.winter.config.ConfigManager;
 import pers.winter.db.AbstractBaseEntity;
 import pers.winter.db.entity.Student;
 import pers.winter.entity.EntityManager;
+import pers.winter.entity.Transaction;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,23 +31,19 @@ import java.util.concurrent.CountDownLatch;
 
 public class TestSave {
     private static void testInsert(){
-        Set<AbstractBaseEntity> insertSet = new HashSet<>();
         for(short i = 0;i<10;i++){
             Student student = new Student();
+            student.setId(1000+i);
             student.setBirthday(System.currentTimeMillis());
             student.setTranscript(i%2==0?null:new Transcript());
             student.setDormitory(1);
-            student.setName("Name"+i);
+            student.setName(Thread.currentThread().getName()+"Insert");
             student.setSex(i);
             student.insert();
-            insertSet.add(student);
         }
-        boolean result = EntityManager.INSTANCE.save(insertSet);
-        System.out.println("insert:"+result);
     }
-    private static boolean testUpdate() throws Exception {
+    private static void testUpdate() throws Exception {
         List<Student> students = EntityManager.INSTANCE.selectByKey(1, Student.class);
-        Set<AbstractBaseEntity> set = new HashSet<>();
         for(int i = 0;i<students.size();i++){
             Student student = students.get(i);
             student.setName(Thread.currentThread().getName());
@@ -57,20 +54,34 @@ public class TestSave {
             student.getTranscript().setMath((short) 100);
             student.getTranscript().setEnglish((short) 100);
             student.update();
-            set.add(student);
         }
-        return EntityManager.INSTANCE.save(set);
     }
 
-    private static boolean testDelete() throws Exception{
+    private static void testDelete() throws Exception{
         List<Student> students = EntityManager.INSTANCE.selectByKey(1, Student.class);
-        Set<AbstractBaseEntity> set = new HashSet<>();
-        for(int i = 0;i<students.size();i++){
-            Student student = students.get(i);
-            student.delete();
-            set.add(student);
+        while(!students.isEmpty()){
+            students.get(students.size() - 1).delete();
         }
-        return EntityManager.INSTANCE.save(set);
+    }
+
+    private static void testTransaction() throws Exception{
+        new Transaction("TestTransaction",10) {
+            @Override
+            protected void process() {
+                try{
+                    testInsert();
+                    testUpdate();
+                    testDelete();
+                } catch (Exception e){
+                    e.printStackTrace();
+                    System.exit(-1);
+                }
+            }
+            @Override
+            protected void failed() {
+                System.out.println(Thread.currentThread().getName() + " failed!");
+            }
+        }.run();
     }
 
     public static void main(String[] args) throws Throwable {
@@ -85,10 +96,7 @@ public class TestSave {
         for(int i = 0;i<threadSize;i++){
             Thread t = new Thread(()->{
                 try {
-                    boolean result = false;
-                    while(result == false){
-                        result = testUpdate();
-                    }
+                    testTransaction();
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(-1);
