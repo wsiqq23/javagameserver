@@ -20,8 +20,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.conversions.Bson;
 import pers.winter.cache.memory.MemoryCache;
+import pers.winter.cache.redis.RedisCache;
 import pers.winter.cache.thread.ThreadCacheManager;
 import pers.winter.db.*;
+import pers.winter.redis.RedisManager;
 import pers.winter.utils.SnowFlakeIdGenerator;
 
 import java.util.ArrayList;
@@ -33,26 +35,33 @@ public class EntityManager {
     private static final Logger logger = LogManager.getLogger(EntityManager.class);
 
     private MemoryCache memoryCache;
+    private RedisCache redisCache;
+
     private EntityManager(){}
 
     public void init() throws Exception {
         DatabaseCenter.INSTANCE.init();
+        RedisManager.INSTANCE.init();
         memoryCache = new MemoryCache();
+        redisCache = new RedisCache();
     }
 
     public <T extends AbstractBaseEntity> List<T> selectByKey(long key, Class<T> entityClass) throws Exception{
-        List<T> result;
+        List<T> result = ThreadCacheManager.INSTANCE.selectByKey(key,entityClass);
+        if(result != null){
+            return result;
+        }
         AnnTable annTable = entityClass.getAnnotation(AnnTable.class);
-        if(annTable.cacheType() == Constants.CacheType.MEMORY){
-            result = ThreadCacheManager.INSTANCE.selectByKey(key,entityClass);
-            if(result != null){
-                return result;
-            }
-            result = memoryCache.selectByKey(key,entityClass);
-            if(result != null){
-                ThreadCacheManager.INSTANCE.syncToCache(key, result,entityClass);
-                return result;
-            }
+        if(annTable.cacheType() == Constants.CacheType.MEMORY) {
+            result = memoryCache.selectByKey(key, entityClass);
+        } else {
+            result = redisCache.selectByKey(key,entityClass);
+        }
+        if(result != null){
+            ThreadCacheManager.INSTANCE.syncToCache(key, result,entityClass);
+            return result;
+        }
+        if(annTable.cacheType() == Constants.CacheType.MEMORY) {
             memoryCache.lockCache(key,entityClass);
             try{
                 result = memoryCache.selectByKey(key,entityClass);
@@ -61,13 +70,22 @@ public class EntityManager {
                     memoryCache.syncToCache(key,result,entityClass);
                     result = memoryCache.selectByKey(key,entityClass);
                 }
-                ThreadCacheManager.INSTANCE.syncToCache(key, result,entityClass);
-            }finally {
+            } finally {
                 memoryCache.unlockCache(key,entityClass);
             }
         } else {
-            result = new ArrayList<>();
+            redisCache.lockCache(key,entityClass);
+            try{
+                result = redisCache.selectByKey(key,entityClass);
+                if(result == null){
+                    result = DatabaseCenter.INSTANCE.selectByKey(key,entityClass);
+                    redisCache.syncToCache(key,result,entityClass);
+                }
+            } finally {
+                redisCache.unlockCache(key,entityClass);
+            }
         }
+        ThreadCacheManager.INSTANCE.syncToCache(key, result,entityClass);
         return result;
     }
 
@@ -84,7 +102,12 @@ public class EntityManager {
     }
 
     private <T extends AbstractBaseEntity> void syncFromCache(List<T> entities, Class<T> entityClass){
-        memoryCache.syncFromCache(entities,entityClass);
+        AnnTable annTable = entityClass.getAnnotation(AnnTable.class);
+        if(annTable.cacheType() == Constants.CacheType.MEMORY) {
+            memoryCache.syncFromCache(entities, entityClass);
+        } else {
+            redisCache.syncFromCache(entities,entityClass);
+        }
         ThreadCacheManager.INSTANCE.syncFromCache(entities,entityClass);
     }
 
@@ -114,26 +137,31 @@ public class EntityManager {
         boolean redisLocked = true;
         try{
             if(!entitiesInMemory.isEmpty() && !memoryCache.lockEntities(entitiesInMemory)) {
+                logger.debug("Failed to lock memory.");
                 memoryLocked = false;
                 return false;
             }
-            if(!entitiesInRedis.isEmpty()){
-                //TODO lock entities in redis
-            }
-            if(!entitiesInMemory.isEmpty() && !memoryCache.checkVersion(entitiesInMemory)){
+            if(!entitiesInRedis.isEmpty() && !redisCache.lockEntities(entitiesInRedis)) {
+                logger.debug("Failed to lock redis.");
+                redisLocked = false;
                 return false;
             }
-            if(!entitiesInRedis.isEmpty()){
-                //TODO check version in redis
+            if(!entitiesInMemory.isEmpty() && !memoryCache.checkVersion(entitiesInMemory)){
+                logger.debug("Failed to check memory version.");
+                return false;
+            }
+            if(!entitiesInRedis.isEmpty() && !redisCache.checkVersion(entitiesInRedis)){
+                logger.debug("Failed to check redis version.");
+                return false;
             }
             for(AbstractBaseEntity entity:entities){
-                EntityVersionProxy.setEntityVersion(entity, entity.getEntityVersion() + 1);
+                entity.modifyEntityVersion(entity.getEntityVersion() + 1);
             }
             if(!entitiesInMemory.isEmpty()){
                 memoryCache.save(entitiesInMemory);
             }
             if(!entitiesInRedis.isEmpty()){
-                //TODO save in redis
+                redisCache.save(entitiesInRedis);
             }
             DatabaseCenter.INSTANCE.save(entities);
         } finally {
@@ -141,7 +169,7 @@ public class EntityManager {
                 memoryCache.unlockEntities(entitiesInMemory);
             }
             if(redisLocked && !entitiesInRedis.isEmpty()){
-                //TODO release lock in redis
+                redisCache.unlockEntities(entitiesInRedis);
             }
         }
         return true;

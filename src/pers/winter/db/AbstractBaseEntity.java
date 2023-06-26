@@ -15,6 +15,7 @@
  */
 package pers.winter.db;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import org.bson.Document;
 import pers.winter.cache.thread.ThreadCacheManager;
 import pers.winter.db.mongo.ISerializableMongoObject;
@@ -45,6 +46,10 @@ public abstract class AbstractBaseEntity implements ISerializableMongoObject, IC
     }
     public int getEntityVersion(){
         return entityVersion;
+    }
+    @JSONField(name="entityVersion")
+    public void modifyEntityVersion(int entityVersion){
+        this.entityVersion = entityVersion;
     }
     protected void setEntityVersion(int entityVersion){
         this.entityVersion = entityVersion;

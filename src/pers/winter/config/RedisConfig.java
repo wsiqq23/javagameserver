@@ -13,10 +13,23 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.db;
+package pers.winter.config;
 
-public class EntityVersionProxy {
-    public static void setEntityVersion(AbstractBaseEntity entity, int version){
-        entity.setEntityVersion(version);
+@AnnConfig(filePath = "config/redis.properties")
+public class RedisConfig {
+    private boolean cluster;
+    private String url;
+    private String password;
+
+    public boolean isCluster() {
+        return cluster;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

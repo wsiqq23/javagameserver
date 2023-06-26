@@ -10,7 +10,8 @@
 	</appenders>
 	<loggers>
 		<logger name="io.netty.util" level="WARN"/>
-		<root level="DEBUG">
+		<logger name="io.lettuce.core" level="WARN"/>
+		<root level="INFO">
 			<appender-ref ref="Console" />
 		</root>
 	</loggers>
