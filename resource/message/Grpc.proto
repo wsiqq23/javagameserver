@@ -1,0 +1,12 @@
+syntax = "proto3";
+package io.grpc;
+option java_package = "pers.winter.service.proto";
+message RpcRequest{
+    string data=1;
+}
+message RpcResponse{
+    string data=1;
+}
+service TestService {
+    rpc test(RpcRequest) returns (RpcResponse){};
+}

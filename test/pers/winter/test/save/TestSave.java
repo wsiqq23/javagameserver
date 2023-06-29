@@ -69,9 +69,9 @@ public class TestSave {
             @Override
             protected void process() {
                 try{
-                    testInsert();
+//                    testInsert();
                     testUpdate();
-                    testDelete();
+//                    testDelete();
                 } catch (Exception e){
                     e.printStackTrace();
                     System.exit(-1);
@@ -87,10 +87,6 @@ public class TestSave {
     public static void main(String[] args) throws Throwable {
         ConfigManager.INSTANCE.init();
         EntityManager.INSTANCE.init();
-        List<Student> students = EntityManager.INSTANCE.selectByKey(1,Student.class);
-        if(students.isEmpty()) {
-            testInsert();
-        }
         final int threadSize = 10;
         CountDownLatch cd = new CountDownLatch(threadSize);
         for(int i = 0;i<threadSize;i++){

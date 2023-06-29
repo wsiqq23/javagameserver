@@ -19,6 +19,8 @@ package pers.winter.config;
 public class ApplicationConfig {
     private int socketPort;
     private int webSocketPort;
+    private int kcpPort;
+    private int grpcPort;
     private short idleStateTime;
     private short messageThreadPoolCount;
     private short databaseThreadPoolCount;
@@ -30,6 +32,8 @@ public class ApplicationConfig {
     public int getWebSocketPort() {
         return webSocketPort;
     }
+    public int getKcpPort(){return kcpPort;}
+    public int getGrpcPort(){return grpcPort;}
     public short getIdleStateTime(){
         return idleStateTime;
     }

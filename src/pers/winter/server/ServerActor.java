@@ -18,6 +18,8 @@ package pers.winter.server;
 import pers.winter.config.ApplicationConfig;
 import pers.winter.config.ConfigManager;
 import pers.winter.message.MessageCenter;
+import pers.winter.server.grpc.GrpcServer;
+import pers.winter.server.kcp.KcpServer;
 import pers.winter.server.socket.IServer;
 import pers.winter.server.socket.SocketServer;
 import pers.winter.server.socket.WebSocketServer;
@@ -26,6 +28,7 @@ public class ServerActor {
     public static final ServerActor INSTANCE = new ServerActor();
     private IServer socketServer;
     private IServer webSocketServer;
+    private IServer kcpServer;
     public void start() throws Exception{
         MessageCenter.INSTANCE.start();
         if(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getSocketPort()>0){
@@ -36,6 +39,14 @@ public class ServerActor {
             webSocketServer = new WebSocketServer();
             webSocketServer.start(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getWebSocketPort());
         }
+        if(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getKcpPort()>0){
+            kcpServer = new KcpServer();
+            kcpServer.start(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getKcpPort());
+        }
+        if(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getGrpcPort()>0){
+            GrpcServer server = new GrpcServer();
+            server.start(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getGrpcPort());
+        }
     }
 
     public void terminate() {
@@ -45,6 +56,9 @@ public class ServerActor {
         }
         if(webSocketServer != null) {
             webSocketServer.stop();
+        }
+        if(kcpServer != null){
+            kcpServer.stop();
         }
     }
 }

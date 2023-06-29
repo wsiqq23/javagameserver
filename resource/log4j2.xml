@@ -11,6 +11,7 @@
 	<loggers>
 		<logger name="io.netty.util" level="WARN"/>
 		<logger name="io.lettuce.core" level="WARN"/>
+		<logger name="io.jpower.kcp.netty" level="WARN"/>
 		<root level="INFO">
 			<appender-ref ref="Console" />
 		</root>
