@@ -20,6 +20,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.protobuf.GeneratedMessageV3;
 import com.google.protobuf.Parser;
 import pers.winter.message.proto.Demo;
+import pers.winter.service.proto.Grpc;
 
 /**
  * A dictionary for proto message id.
@@ -43,5 +44,7 @@ public class ProtoMessageDictionary {
     static{
         DICTIONARY.put(1, Demo.Hello.getDefaultInstance());
         DICTIONARY.put(2, Demo.Bye.getDefaultInstance());
+        DICTIONARY.put(3, Grpc.RpcRequest.getDefaultInstance());
+        DICTIONARY.put(4,Grpc.RpcResponse.getDefaultInstance());
     }
 }
