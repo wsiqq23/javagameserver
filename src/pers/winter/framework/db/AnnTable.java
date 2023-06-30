@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.db;
+package pers.winter.framework.db;
 
-import pers.winter.db.mysql.AbstractBaseDao;
+import pers.winter.framework.db.mysql.AbstractBaseDao;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

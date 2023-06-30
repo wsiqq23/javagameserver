@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.cache.redis;
+package pers.winter.framework.cache.redis;
 
 import com.alibaba.fastjson.JSON;
 import io.lettuce.core.LettuceFutures;
@@ -27,12 +27,12 @@ import io.lettuce.core.api.sync.RedisKeyCommands;
 import io.lettuce.core.api.sync.RedisStringCommands;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.config.ApplicationConfig;
-import pers.winter.config.ConfigManager;
-import pers.winter.db.AbstractBaseEntity;
-import pers.winter.db.Constants;
-import pers.winter.redis.RedisConnection;
-import pers.winter.redis.RedisManager;
+import pers.winter.framework.config.ApplicationConfig;
+import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.db.AbstractBaseEntity;
+import pers.winter.framework.db.Constants;
+import pers.winter.framework.redis.RedisConnection;
+import pers.winter.framework.redis.RedisManager;
 
 import java.io.IOException;
 import java.io.InputStream;

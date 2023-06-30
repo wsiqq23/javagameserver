@@ -13,18 +13,21 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.entity;
+package pers.winter.framework.entity;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.conversions.Bson;
-import pers.winter.cache.memory.MemoryCache;
-import pers.winter.cache.redis.RedisCache;
-import pers.winter.cache.thread.ThreadCacheManager;
-import pers.winter.db.*;
-import pers.winter.redis.RedisManager;
-import pers.winter.utils.SnowFlakeIdGenerator;
+import pers.winter.framework.cache.memory.MemoryCache;
+import pers.winter.framework.cache.redis.RedisCache;
+import pers.winter.framework.cache.thread.ThreadCacheManager;
+import pers.winter.framework.db.AbstractBaseEntity;
+import pers.winter.framework.db.AnnTable;
+import pers.winter.framework.db.Constants;
+import pers.winter.framework.db.DatabaseCenter;
+import pers.winter.framework.redis.RedisManager;
+import pers.winter.framework.utils.SnowFlakeIdGenerator;
 
 import java.util.ArrayList;
 import java.util.List;

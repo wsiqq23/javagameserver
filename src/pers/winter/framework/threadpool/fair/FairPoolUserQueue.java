@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.threadpool.fair;
+package pers.winter.framework.threadpool.fair;
 
 import java.util.LinkedList;
 import java.util.Queue;

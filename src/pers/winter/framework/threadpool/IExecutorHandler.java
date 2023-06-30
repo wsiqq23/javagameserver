@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.threadpool;
+package pers.winter.framework.threadpool;
 
 /**
  * The handler for thread pool executors.

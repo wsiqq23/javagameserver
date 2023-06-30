@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.db.mysql;
+package pers.winter.framework.db.mysql;
 
-import pers.winter.db.AbstractBaseEntity;
+import pers.winter.framework.db.AbstractBaseEntity;
 
 import java.sql.Connection;
 import java.sql.SQLException;

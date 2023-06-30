@@ -16,8 +16,8 @@
 package pers.winter.bean;
 
 import org.bson.Document;
-import pers.winter.db.mongo.ISerializableMongoObject;
-import pers.winter.entity.ICloneable;
+import pers.winter.framework.db.mongo.ISerializableMongoObject;
+import pers.winter.framework.entity.ICloneable;
 
 public class Transcript implements ISerializableMongoObject, ICloneable {
     private short math;

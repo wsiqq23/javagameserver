@@ -13,11 +13,11 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.server.codec;
+package pers.winter.framework.server.codec;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import pers.winter.message.AbstractBaseMessage;
+import pers.winter.framework.message.AbstractBaseMessage;
 import pers.winter.message.json.Bye;
 import pers.winter.message.json.Hello;
 

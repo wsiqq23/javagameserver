@@ -34,11 +34,10 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import pers.winter.message.json.Bye;
 import pers.winter.message.json.Hello;
-import pers.winter.message.proto.Demo;
-import pers.winter.server.codec.Constants;
-import pers.winter.server.codec.JsonEncoder;
-import pers.winter.server.codec.MessageDecoder;
-import pers.winter.server.codec.ProtoEncoder;
+import pers.winter.framework.server.codec.Constants;
+import pers.winter.framework.server.codec.JsonEncoder;
+import pers.winter.framework.server.codec.MessageDecoder;
+import pers.winter.framework.server.codec.ProtoEncoder;
 
 public class SocketClient {
     private Logger log = LogManager.getLogger(SocketClient.class);

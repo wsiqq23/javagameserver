@@ -13,13 +13,13 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.db;
+package pers.winter.framework.db;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import org.bson.Document;
-import pers.winter.cache.thread.ThreadCacheManager;
-import pers.winter.db.mongo.ISerializableMongoObject;
-import pers.winter.entity.ICloneable;
+import pers.winter.framework.cache.thread.ThreadCacheManager;
+import pers.winter.framework.db.mongo.ISerializableMongoObject;
+import pers.winter.framework.entity.ICloneable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

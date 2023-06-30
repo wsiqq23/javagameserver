@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.db;
+package pers.winter.framework.db;
 
 public class Constants {
     public enum DBType{

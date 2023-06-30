@@ -13,15 +13,15 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.serviceimpl;
+package pers.winter.example.serviceimpl;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pers.winter.db.entity.Student;
-import pers.winter.entity.EntityManager;
-import pers.winter.message.AnnMessageMethod;
-import pers.winter.message.AnnMessageServiceImpl;
+import pers.winter.framework.entity.EntityManager;
+import pers.winter.framework.message.AnnMessageMethod;
+import pers.winter.framework.message.AnnMessageServiceImpl;
 import pers.winter.message.json.Bye;
 import pers.winter.message.json.Hello;
 

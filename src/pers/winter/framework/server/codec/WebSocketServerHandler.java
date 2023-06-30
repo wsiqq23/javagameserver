@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.server.codec;
+package pers.winter.framework.server.codec;
 
 import com.google.protobuf.GeneratedMessageV3;
 import io.netty.channel.Channel;
@@ -25,8 +25,8 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.message.AbstractBaseMessage;
-import pers.winter.message.MessageCenter;
+import pers.winter.framework.message.AbstractBaseMessage;
+import pers.winter.framework.message.MessageCenter;
 
 import java.net.InetSocketAddress;
 

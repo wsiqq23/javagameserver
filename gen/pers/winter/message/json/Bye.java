@@ -15,7 +15,7 @@
  */
 package pers.winter.message.json;
 
-import pers.winter.message.AbstractBaseMessage;
+import pers.winter.framework.message.AbstractBaseMessage;
 
 public class Bye extends AbstractBaseMessage {
     public String data1;

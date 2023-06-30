@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.config;
+package pers.winter.framework.config;
 
 @AnnConfig(filePath="config/application.properties")
 public class ApplicationConfig {

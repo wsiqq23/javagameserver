@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.server.codec;
+package pers.winter.framework.server.codec;
 
 import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
-import pers.winter.message.AbstractBaseMessage;
+import pers.winter.framework.message.AbstractBaseMessage;
 
 /**
  * Message encoder for JSON message

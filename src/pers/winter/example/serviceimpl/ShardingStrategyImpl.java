@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.serviceimpl;
+package pers.winter.example.serviceimpl;
 
-import pers.winter.db.mysql.IShardingStrategy;
+import pers.winter.framework.db.mysql.IShardingStrategy;
 
 public class ShardingStrategyImpl implements IShardingStrategy {
     @Override

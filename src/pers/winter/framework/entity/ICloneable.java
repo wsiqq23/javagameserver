@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.entity;
+package pers.winter.framework.entity;
 
 /**
  * The {@code ICloneable} interface represents an object that supports deep cloning.

@@ -18,9 +18,9 @@ package pers.winter.db.entity;
 import com.alibaba.fastjson.JSON;
 import org.bson.Document;
 import pers.winter.bean.Transcript;
-import pers.winter.db.AbstractBaseEntity;
-import pers.winter.db.AnnTable;
-import pers.winter.db.Constants;
+import pers.winter.framework.db.AbstractBaseEntity;
+import pers.winter.framework.db.AnnTable;
+import pers.winter.framework.db.Constants;
 import pers.winter.db.dao.StudentDao;
 
 import java.sql.PreparedStatement;

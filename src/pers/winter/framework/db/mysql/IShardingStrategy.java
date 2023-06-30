@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.db.mysql;
+package pers.winter.framework.db.mysql;
 
 /**
  * The ShardingStrategy interface should be implemented by the user to define their own strategy for sharding data to different databases.

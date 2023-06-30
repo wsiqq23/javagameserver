@@ -15,10 +15,10 @@
  */
 package pers.winter;
 
-import pers.winter.config.ConfigManager;
-import pers.winter.entity.EntityManager;
-import pers.winter.server.ServerActor;
-import pers.winter.server.ShutdownHook;
+import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.entity.EntityManager;
+import pers.winter.framework.server.ServerActor;
+import pers.winter.framework.server.ShutdownHook;
 
 /**
  * The main entrance of application

@@ -15,9 +15,9 @@
  */
 package pers.winter.db.dao;
 
-import pers.winter.db.AbstractBaseEntity;
+import pers.winter.framework.db.AbstractBaseEntity;
 import pers.winter.db.entity.Student;
-import pers.winter.db.mysql.AbstractBaseDao;
+import pers.winter.framework.db.mysql.AbstractBaseDao;
 
 import java.sql.*;
 import java.util.ArrayList;

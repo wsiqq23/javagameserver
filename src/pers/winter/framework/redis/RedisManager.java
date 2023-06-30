@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.redis;
+package pers.winter.framework.redis;
 
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
@@ -23,8 +23,8 @@ import io.lettuce.core.pubsub.RedisPubSubListener;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.config.ConfigManager;
-import pers.winter.config.RedisConfig;
+import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.config.RedisConfig;
 
 import java.io.IOException;
 import java.util.ArrayList;

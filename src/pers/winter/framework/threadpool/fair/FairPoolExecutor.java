@@ -13,11 +13,11 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.threadpool.fair;
+package pers.winter.framework.threadpool.fair;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.threadpool.IExecutorHandler;
+import pers.winter.framework.threadpool.IExecutorHandler;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;

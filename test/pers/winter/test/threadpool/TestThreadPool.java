@@ -15,8 +15,8 @@
  */
 package pers.winter.test.threadpool;
 
-import pers.winter.threadpool.IExecutorHandler;
-import pers.winter.threadpool.fair.FairPoolExecutor;
+import pers.winter.framework.threadpool.IExecutorHandler;
+import pers.winter.framework.threadpool.fair.FairPoolExecutor;
 
 public class TestThreadPool {
     public static void testFairPool() throws InterruptedException {

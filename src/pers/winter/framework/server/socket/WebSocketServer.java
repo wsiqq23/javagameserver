@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.server.socket;
+package pers.winter.framework.server.socket;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -30,9 +30,9 @@ import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketSe
 import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.config.ApplicationConfig;
-import pers.winter.config.ConfigManager;
-import pers.winter.server.codec.*;
+import pers.winter.framework.config.ApplicationConfig;
+import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.server.codec.*;
 
 import java.util.concurrent.TimeUnit;
 

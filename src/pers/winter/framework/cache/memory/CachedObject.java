@@ -13,11 +13,10 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.cache.memory;
+package pers.winter.framework.cache.memory;
 
-import pers.winter.db.AbstractBaseEntity;
+import pers.winter.framework.db.AbstractBaseEntity;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;

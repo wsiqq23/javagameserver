@@ -13,18 +13,18 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.db;
+package pers.winter.framework.db;
 
 import com.alibaba.fastjson.JSON;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.config.ApplicationConfig;
-import pers.winter.config.ConfigManager;
-import pers.winter.db.mongo.MongoConnector;
-import pers.winter.db.mysql.MySqlConnector;
-import pers.winter.threadpool.IExecutorHandler;
-import pers.winter.threadpool.fair.FairPoolExecutor;
-import pers.winter.utils.SnowFlakeIdGenerator;
+import pers.winter.framework.config.ApplicationConfig;
+import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.db.mongo.MongoConnector;
+import pers.winter.framework.db.mysql.MySqlConnector;
+import pers.winter.framework.threadpool.IExecutorHandler;
+import pers.winter.framework.threadpool.fair.FairPoolExecutor;
+import pers.winter.framework.utils.SnowFlakeIdGenerator;
 
 import java.util.List;
 import java.util.Set;

@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.cache.thread;
+package pers.winter.framework.cache.thread;
 
-import pers.winter.db.AbstractBaseEntity;
+import pers.winter.framework.db.AbstractBaseEntity;
 
 import java.util.List;
 import java.util.Map;

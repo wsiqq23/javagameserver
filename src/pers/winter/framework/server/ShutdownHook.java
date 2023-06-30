@@ -13,11 +13,11 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.server;
+package pers.winter.framework.server;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.db.DatabaseCenter;
+import pers.winter.framework.db.DatabaseCenter;
 
 public class ShutdownHook extends Thread{
     private static final Logger logger = LogManager.getLogger(ShutdownHook.class);

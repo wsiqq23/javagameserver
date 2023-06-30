@@ -13,9 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.config;
+package pers.winter.framework.config;
 
-import pers.winter.utils.ClassScanner;
+import pers.winter.framework.utils.ClassScanner;
 import sun.misc.Unsafe;
 
 import java.io.InputStream;

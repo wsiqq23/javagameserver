@@ -13,20 +13,20 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.db.mysql;
+package pers.winter.framework.db.mysql;
 
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import com.alibaba.fastjson.JSON;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.config.AnnConfig;
-import pers.winter.config.ConfigManager;
-import pers.winter.config.MySqlConfig;
-import pers.winter.db.AbstractBaseEntity;
-import pers.winter.db.AbstractConnector;
-import pers.winter.db.AnnTable;
-import pers.winter.db.Constants;
-import pers.winter.utils.ClassScanner;
+import pers.winter.framework.config.AnnConfig;
+import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.config.MySqlConfig;
+import pers.winter.framework.db.AbstractBaseEntity;
+import pers.winter.framework.db.AbstractConnector;
+import pers.winter.framework.db.AnnTable;
+import pers.winter.framework.db.Constants;
+import pers.winter.framework.utils.ClassScanner;
 
 import javax.sql.DataSource;
 import java.io.InputStream;

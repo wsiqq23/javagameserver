@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.utils;
+package pers.winter.framework.utils;
 
 public class SnowFlakeIdGenerator {
     private static long nodeID;

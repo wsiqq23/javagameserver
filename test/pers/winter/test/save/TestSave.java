@@ -15,18 +15,13 @@
  */
 package pers.winter.test.save;
 
-import com.alibaba.fastjson.JSON;
 import pers.winter.bean.Transcript;
-import pers.winter.cache.thread.ThreadCacheManager;
-import pers.winter.config.ConfigManager;
-import pers.winter.db.AbstractBaseEntity;
+import pers.winter.framework.config.ConfigManager;
 import pers.winter.db.entity.Student;
-import pers.winter.entity.EntityManager;
-import pers.winter.entity.Transaction;
+import pers.winter.framework.entity.EntityManager;
+import pers.winter.framework.entity.Transaction;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 public class TestSave {

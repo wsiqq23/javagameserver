@@ -13,14 +13,14 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.server;
+package pers.winter.framework.server;
 
-import pers.winter.config.ApplicationConfig;
-import pers.winter.config.ConfigManager;
-import pers.winter.message.MessageCenter;
-import pers.winter.server.socket.IServer;
-import pers.winter.server.socket.SocketServer;
-import pers.winter.server.socket.WebSocketServer;
+import pers.winter.framework.config.ApplicationConfig;
+import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.message.MessageCenter;
+import pers.winter.framework.server.socket.IServer;
+import pers.winter.framework.server.socket.SocketServer;
+import pers.winter.framework.server.socket.WebSocketServer;
 
 public class ServerActor {
     public static final ServerActor INSTANCE = new ServerActor();

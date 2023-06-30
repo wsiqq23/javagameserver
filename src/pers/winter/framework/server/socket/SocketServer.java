@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.server.socket;
+package pers.winter.framework.server.socket;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -26,9 +26,9 @@ import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.config.ApplicationConfig;
-import pers.winter.config.ConfigManager;
-import pers.winter.server.codec.*;
+import pers.winter.framework.config.ApplicationConfig;
+import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.server.codec.*;
 
 import java.nio.ByteOrder;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +55,7 @@ public class SocketServer implements IServer {
                 ch.pipeline().addLast(new IdleStateHandler(readerIdleTime, 0, 0, TimeUnit.SECONDS));
                 ch.pipeline().addLast(ProtoEncoder.INSTANCE);
                 ch.pipeline().addLast(JsonEncoder.INSTANCE);
-                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN,Constants.MAX_PACKAGE_LENGTH,0,4,0,0,true));
+                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN, Constants.MAX_PACKAGE_LENGTH,0,4,0,0,true));
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(SocketServerHandler.INSTANCE);
             }

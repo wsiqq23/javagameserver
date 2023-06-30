@@ -13,10 +13,10 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.entity;
+package pers.winter.framework.entity;
 
-import pers.winter.cache.thread.ThreadCacheManager;
-import pers.winter.db.AbstractBaseEntity;
+import pers.winter.framework.cache.thread.ThreadCacheManager;
+import pers.winter.framework.db.AbstractBaseEntity;
 
 import java.util.Set;
 

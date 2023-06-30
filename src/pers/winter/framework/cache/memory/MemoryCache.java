@@ -13,18 +13,18 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.cache.memory;
+package pers.winter.framework.cache.memory;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import pers.winter.config.ApplicationConfig;
-import pers.winter.config.ConfigManager;
-import pers.winter.db.AbstractBaseEntity;
-import pers.winter.db.AnnTable;
-import pers.winter.db.Constants;
-import pers.winter.utils.ClassScanner;
+import pers.winter.framework.config.ApplicationConfig;
+import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.db.AbstractBaseEntity;
+import pers.winter.framework.db.AnnTable;
+import pers.winter.framework.db.Constants;
+import pers.winter.framework.utils.ClassScanner;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
