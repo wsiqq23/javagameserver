@@ -5,6 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pers.winter.service.proto.Grpc;
 
 public class KcpClientHandler extends SimpleChannelInboundHandler {
     private Logger logger = LogManager.getLogger(KcpClientHandler.class);
@@ -15,7 +16,10 @@ public class KcpClientHandler extends SimpleChannelInboundHandler {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object msg) throws Exception {
-        logger.debug("Self conv:{}, Receive Proto message: {}",conv,msg);
+        if(msg.getClass() == Grpc.RpcResponse.class){
+            System.out.println("KCP cost:"+(System.currentTimeMillis()-KcpClient.sendTime));
+            KcpClient.sendTime = 0;
+        }
     }
 
     @Override

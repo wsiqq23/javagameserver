@@ -13,12 +13,15 @@ import pers.winter.server.codec.Constants;
 import pers.winter.server.codec.JsonEncoder;
 import pers.winter.server.codec.MessageDecoder;
 import pers.winter.server.codec.ProtoEncoder;
+import pers.winter.service.proto.Grpc;
+import pers.winter.test.grpc.TestGrpc;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 
 public class KcpClient {
     private Logger log = LogManager.getLogger(KcpClient.class);
+    public static long sendTime;
     protected EventLoopGroup workerGroup = null;
     protected Channel channel = null;
     private String ip;
@@ -39,7 +42,6 @@ public class KcpClient {
             protected void initChannel(UkcpChannel ch) throws Exception {
                 ch.pipeline().addLast(ProtoEncoder.INSTANCE);
                 ch.pipeline().addLast(JsonEncoder.INSTANCE);
-                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN, Constants.MAX_PACKAGE_LENGTH,0,4,0,0,true));
                 ch.pipeline().addLast(new MessageDecoder());
                 ch.pipeline().addLast(new KcpClientHandler(conv));
             }
@@ -48,7 +50,7 @@ public class KcpClient {
         ChannelFuture future = bootstrap.connect(new InetSocketAddress(this.ip, this.port)).sync();
         if (future.isSuccess()) {
             this.channel = future.channel();
-            log.info("Netty socket client to [ip:{}, port:{}]", this.ip, port);
+            log.info("Netty kcp client to [ip:{}, port:{}]", this.ip, port);
             return true;
         } else {
             return false;
@@ -71,16 +73,19 @@ public class KcpClient {
     }
 
     public static void main(String[] args) throws Exception {
-        for(int i = 0;i<5;i++){
+        for(int i = 0;i<1;i++){
             Thread t = new Thread(()->{
                 final long nodeID = 1001 + Integer.parseInt(Thread.currentThread().getName());
-                KcpClient client = new KcpClient("127.0.0.1",7003, (int) nodeID);
+                KcpClient client = new KcpClient("192.168.6.13",7003, (int) nodeID);
                 try {
                     client.connect();
                 while(true){
-//                    Demo.KcpHandshake handshake = Demo.KcpHandshake.newBuilder().setNodeID(nodeID).build();
-//                    client.send(handshake);
-//                    Thread.sleep(1000);
+                    if(sendTime==0) {
+                        sendTime = System.currentTimeMillis();
+                        Grpc.RpcRequest request = Grpc.RpcRequest.newBuilder().setData(TestGrpc.requestData).build();
+                        client.send(request);
+                        Thread.sleep(1000);
+                    }
                 }
                 } catch (Exception e) {
                     e.printStackTrace();
