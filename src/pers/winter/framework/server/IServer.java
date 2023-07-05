@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.framework.server.socket;
+package pers.winter.framework.server;
 
 /**
  * The interface to start or stop a web server with Netty

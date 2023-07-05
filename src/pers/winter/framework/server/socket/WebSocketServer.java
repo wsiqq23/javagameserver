@@ -32,6 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pers.winter.framework.config.ApplicationConfig;
 import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.server.IServer;
 import pers.winter.framework.server.codec.*;
 
 import java.util.concurrent.TimeUnit;

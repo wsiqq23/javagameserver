@@ -19,17 +19,18 @@ package pers.winter.framework.config;
 public class ApplicationConfig {
     private int socketPort;
     private int webSocketPort;
+    private int httpPort;
     private short idleStateTime;
     private short messageThreadPoolCount;
     private short databaseThreadPoolCount;
     private long nodeID;
     private int cacheExpire;
+    private short timerThreadPoolCount;
     public int getSocketPort() {
         return socketPort;
     }
-    public int getWebSocketPort() {
-        return webSocketPort;
-    }
+    public int getWebSocketPort() {return webSocketPort;}
+    public int getHttpPort(){return httpPort;}
     public short getIdleStateTime(){
         return idleStateTime;
     }
@@ -39,4 +40,5 @@ public class ApplicationConfig {
     public short getDatabaseThreadPoolCount(){return databaseThreadPoolCount;}
     public long getNodeID(){return nodeID;}
     public int getCacheExpire(){return cacheExpire;}
+    public short getTimerThreadPoolCount(){return timerThreadPoolCount;}
 }

@@ -18,7 +18,7 @@ package pers.winter.framework.server;
 import pers.winter.framework.config.ApplicationConfig;
 import pers.winter.framework.config.ConfigManager;
 import pers.winter.framework.message.MessageCenter;
-import pers.winter.framework.server.socket.IServer;
+import pers.winter.framework.server.http.HttpServer;
 import pers.winter.framework.server.socket.SocketServer;
 import pers.winter.framework.server.socket.WebSocketServer;
 
@@ -26,15 +26,21 @@ public class ServerActor {
     public static final ServerActor INSTANCE = new ServerActor();
     private IServer socketServer;
     private IServer webSocketServer;
+    private IServer httpServer;
     public void start() throws Exception{
         MessageCenter.INSTANCE.start();
-        if(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getSocketPort()>0){
+        ApplicationConfig appConfig = ConfigManager.INSTANCE.getConfig(ApplicationConfig.class);
+        if(appConfig.getSocketPort()>0){
             socketServer = new SocketServer();
-            socketServer.start(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getSocketPort());
+            socketServer.start(appConfig.getSocketPort());
         }
-        if(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getWebSocketPort()>0) {
+        if(appConfig.getWebSocketPort()>0) {
             webSocketServer = new WebSocketServer();
-            webSocketServer.start(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getWebSocketPort());
+            webSocketServer.start(appConfig.getWebSocketPort());
+        }
+        if(appConfig.getHttpPort()>0){
+            httpServer = new HttpServer();
+            httpServer.start(appConfig.getHttpPort());
         }
     }
 
@@ -45,6 +51,9 @@ public class ServerActor {
         }
         if(webSocketServer != null) {
             webSocketServer.stop();
+        }
+        if(httpServer != null){
+            httpServer.stop();
         }
     }
 }
