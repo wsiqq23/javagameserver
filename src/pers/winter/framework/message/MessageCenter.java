@@ -20,11 +20,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pers.winter.framework.config.ApplicationConfig;
 import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.config.MonitorConfig;
 import pers.winter.framework.entity.Transaction;
+import pers.winter.framework.monitor.MonitorCenter;
 import pers.winter.framework.threadpool.fair.FairPoolExecutor;
+import pers.winter.framework.timer.TimerTaskManager;
 import pers.winter.message.json.ActionFail;
 import pers.winter.framework.threadpool.IExecutorHandler;
 import pers.winter.framework.utils.ClassScanner;
+import pers.winter.monitor.ExecutorError;
+import pers.winter.monitor.MessageProcessSlow;
+import pers.winter.monitor.MessageTransactionFail;
+import pers.winter.monitor.ExecutorQueueOverflow;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -35,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Message center of the server, manage all actions about message.
@@ -49,6 +57,7 @@ public class MessageCenter {
     private FairPoolExecutor<AbstractBaseMessage> executor;
     private boolean terminated = false;
     private ConcurrentHashMap<Thread,MessageTransaction> transactionPool;
+    private TimerTaskManager.RepeatedTimerTask monitorTask;
 
     /**
      * Scan all classes in the project and init the handler for every message.
@@ -60,6 +69,7 @@ public class MessageCenter {
     public void start() throws Exception {
         initMessageHandler();
         initTransactionPool();
+        initMonitor();
         startExecutor();
     }
 
@@ -69,6 +79,7 @@ public class MessageCenter {
      */
     public void terminate() {
         terminated = true;
+        monitorTask.cancel();
         executor.terminate(false);
     }
     private void initMessageHandler() throws Exception {
@@ -98,6 +109,23 @@ public class MessageCenter {
     private void initTransactionPool(){
         short threadCount = ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getMessageThreadPoolCount();
         transactionPool = new ConcurrentHashMap<>(threadCount);
+    }
+    private void initMonitor(){
+        monitorTask = TimerTaskManager.getInstance().newRepeatedTimeout(new Transaction("MessageCenterMonitor") {
+            @Override
+            protected void process() {
+                long messageInExecutor = executor.getEstimatedTaskCount();
+                if(messageInExecutor>ConfigManager.INSTANCE.getConfig(MonitorConfig.class).getMessageQueueOverflowThreshold()){
+                    ExecutorQueueOverflow queueOverflow = new ExecutorQueueOverflow();
+                    queueOverflow.executorName = executor.getName();
+                    queueOverflow.stackedNum = messageInExecutor;
+                    queueOverflow.setTime(System.currentTimeMillis());
+                    MonitorCenter.INSTANCE.report(queueOverflow);
+                }
+            }
+            @Override
+            protected void failed() {}
+        },60,60, TimeUnit.SECONDS,0);
     }
     private void startExecutor(){
         this.executorHandler = new IExecutorHandler<AbstractBaseMessage>() {
@@ -147,10 +175,34 @@ public class MessageCenter {
         }
         @Override
         protected void process() {
+            long st = System.currentTimeMillis();
             try{
                 handler.getMethodHandle().invoke(handler.getService(),message);
-            } catch (Throwable e){
-                logger.error("Execute message {} exception! Data: {}.", message.getClass().getSimpleName(), JSON.toJSONString(message),e);
+            } catch (Throwable cause){
+                logger.error("Execute message {} exception! Data: {}.", message.getClass().getSimpleName(), JSON.toJSONString(message),cause);
+                ExecutorError report = new ExecutorError();
+                report.setTime(System.currentTimeMillis());
+                report.executorName = MessageCenter.INSTANCE.executor.getName();
+                report.taskClass = message.getClass().getSimpleName();
+                report.exceptionClass = cause.getClass().getName();
+                report.exceptionMessage = cause.getMessage();
+                if(cause.getStackTrace() != null){
+                    StringBuilder stackTraceBuilder = new StringBuilder();
+                    for(int i = 0;i<cause.getStackTrace().length;i++){
+                        stackTraceBuilder.append(cause.getStackTrace()[i]);
+                        stackTraceBuilder.append("\n");
+                    }
+                    report.exceptionStackTrace = stackTraceBuilder.toString();
+                }
+                MonitorCenter.INSTANCE.report(report);
+            }
+            long duration = System.currentTimeMillis() - st;
+            if(duration > ConfigManager.INSTANCE.getConfig(MonitorConfig.class).getMessageProcessSlowThreshold()){
+                MessageProcessSlow messageProcessSlow = new MessageProcessSlow();
+                messageProcessSlow.duration = duration;
+                messageProcessSlow.msgClass = message.getClass().getSimpleName();
+                messageProcessSlow.setTime(st);
+                MonitorCenter.INSTANCE.report(messageProcessSlow);
             }
         }
         @Override
@@ -158,6 +210,11 @@ public class MessageCenter {
             if(message.getChannel() != null && message.getChannel().isActive()){
                 message.getChannel().writeAndFlush(new ActionFail());
             }
+            MessageTransactionFail failRecord = new MessageTransactionFail();
+            failRecord.msgClass = message.getClass().getSimpleName();
+            failRecord.retryCount = handler.getRetryCount();
+            failRecord.setTime(System.currentTimeMillis());
+            MonitorCenter.INSTANCE.report(failRecord);
         }
     }
 }

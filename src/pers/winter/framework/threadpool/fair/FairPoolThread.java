@@ -31,12 +31,17 @@ public class FairPoolThread<T> implements Thread.UncaughtExceptionHandler, Runna
     private String name;
     private final FairPoolExecutor<T> boss;
     private IExecutorHandler<T> handler;
+    private long recentStartWork;
 
     public FairPoolThread(String name, FairPoolExecutor<T> boss, IExecutorHandler<T> handler){
         this.name = name;
         this.boss = boss;
         this.handler = handler;
         initThread();
+    }
+
+    public String getName(){
+        return name;
     }
 
     /**
@@ -62,6 +67,11 @@ public class FairPoolThread<T> implements Thread.UncaughtExceptionHandler, Runna
         return thread.getState();
     }
 
+    /**
+     * Get the recent work timestamp of the thread
+     */
+    public long getRecentStartWork() { return recentStartWork;}
+
     @Override
     public void run() {
         while(!interrupted){
@@ -69,10 +79,12 @@ public class FairPoolThread<T> implements Thread.UncaughtExceptionHandler, Runna
                 FairPoolUserQueue<T> userQueue = boss.takeWork();
                 T task = userQueue.takeWork();
                 try{
+                    recentStartWork = System.currentTimeMillis();
                     handler.execute(task);
                 }catch (Throwable e){
                     handler.exceptionCaught(task,e);
                 } finally {
+                    recentStartWork = 0;
                     userQueue.endWork();
                 }
             } catch (InterruptedException e) {
@@ -86,6 +98,7 @@ public class FairPoolThread<T> implements Thread.UncaughtExceptionHandler, Runna
         logger.error("Uncaught exception while executing! Thread: {}",this.name,e);
         if(!interrupted){
             initThread();
+            this.thread.start();
         }
     }
 

@@ -20,14 +20,21 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pers.winter.framework.config.ApplicationConfig;
 import pers.winter.framework.config.ConfigManager;
+import pers.winter.framework.config.MonitorConfig;
 import pers.winter.framework.db.mongo.MongoConnector;
 import pers.winter.framework.db.mysql.MySqlConnector;
+import pers.winter.framework.entity.Transaction;
+import pers.winter.framework.monitor.MonitorCenter;
 import pers.winter.framework.threadpool.IExecutorHandler;
 import pers.winter.framework.threadpool.fair.FairPoolExecutor;
+import pers.winter.framework.timer.TimerTaskManager;
 import pers.winter.framework.utils.SnowFlakeIdGenerator;
+import pers.winter.monitor.ExecutorError;
+import pers.winter.monitor.ExecutorQueueOverflow;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class DatabaseCenter {
     private static final Logger logger = LogManager.getLogger(DatabaseCenter.class);
@@ -37,18 +44,39 @@ public class DatabaseCenter {
     private MongoConnector mongoConnector;
     private FairPoolExecutor<AbstractBaseEntity> executor;
     private boolean terminated = false;
+    private TimerTaskManager.RepeatedTimerTask monitorTask;
     private DatabaseCenter(){}
 
     public void init() throws Exception{
         SnowFlakeIdGenerator.initNodeID(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getNodeID());
         mySqlConnector = new MySqlConnector();
         mongoConnector = new MongoConnector();
+        initMonitor();
         startExecutor();
     }
 
     public void terminate(){
         terminated = true;
+        monitorTask.cancel();
         this.executor.terminate(false);
+    }
+
+    private void initMonitor(){
+        monitorTask = TimerTaskManager.getInstance().newRepeatedTimeout(new Transaction("DatabaseCenterMonitor") {
+            @Override
+            protected void process() {
+                long tasksInExecutor = executor.getEstimatedTaskCount();
+                if(tasksInExecutor>ConfigManager.INSTANCE.getConfig(MonitorConfig.class).getDbQueueOverflowThreshold()){
+                    ExecutorQueueOverflow queueOverflow = new ExecutorQueueOverflow();
+                    queueOverflow.executorName = executor.getName();
+                    queueOverflow.stackedNum = tasksInExecutor;
+                    queueOverflow.setTime(System.currentTimeMillis());
+                    MonitorCenter.INSTANCE.report(queueOverflow);
+                }
+            }
+            @Override
+            protected void failed() {}
+        },60,60, TimeUnit.SECONDS,0);
     }
 
     private void startExecutor(){
@@ -70,10 +98,24 @@ public class DatabaseCenter {
                         throw new IllegalArgumentException("Action invalid.");
                 }
             }
-
             @Override
             public void exceptionCaught(AbstractBaseEntity task, Throwable cause) {
                 logger.error("Exception while saving {}, data: {}",task.getClass().getSimpleName(), JSON.toJSONString(task),cause);
+                ExecutorError report = new ExecutorError();
+                report.setTime(System.currentTimeMillis());
+                report.executorName = executor.getName();
+                report.taskClass = task.getClass().getSimpleName();
+                report.exceptionClass = cause.getClass().getName();
+                report.exceptionMessage = cause.getMessage();
+                if(cause.getStackTrace() != null){
+                    StringBuilder stackTraceBuilder = new StringBuilder();
+                    for(int i = 0;i<cause.getStackTrace().length;i++){
+                        stackTraceBuilder.append(cause.getStackTrace()[i]);
+                        stackTraceBuilder.append("\n");
+                    }
+                    report.exceptionStackTrace = stackTraceBuilder.toString();
+                }
+                MonitorCenter.INSTANCE.report(report);
             }
         });
         executor.start();

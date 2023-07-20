@@ -13,24 +13,12 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter;
+package pers.winter.framework.monitor;
 
-import pers.winter.framework.config.ConfigManager;
-import pers.winter.framework.entity.EntityManager;
-import pers.winter.framework.monitor.MonitorCenter;
-import pers.winter.framework.server.ServerActor;
-import pers.winter.framework.server.ShutdownHook;
-
-/**
- * The main entrance of application
- * @author Winter
- */
-public class Main {
-    public static void main(String[] args) throws Throwable {
-        ConfigManager.INSTANCE.init();
-        EntityManager.INSTANCE.init();
-        MonitorCenter.INSTANCE.init();
-        ServerActor.INSTANCE.start();
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook());
+public abstract class AbstractBaseMonitorBean {
+    private long time;
+    public void setTime(long time){
+        this.time = time;
     }
+    public long getTime(){return time;}
 }

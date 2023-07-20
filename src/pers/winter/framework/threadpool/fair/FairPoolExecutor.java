@@ -17,10 +17,17 @@ package pers.winter.framework.threadpool.fair;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pers.winter.framework.entity.Transaction;
+import pers.winter.framework.monitor.MonitorCenter;
 import pers.winter.framework.threadpool.IExecutorHandler;
+import pers.winter.framework.timer.TimerTaskManager;
+import pers.winter.monitor.ExecutorThreadBlocking;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A fair thread pool executor.
@@ -31,11 +38,17 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class FairPoolExecutor<T> {
     private static final Logger logger = LogManager.getLogger(FairPoolExecutor.class);
+    //If a user queue keeps idle for 5 minutes or longer, it will be removed.
+    private static final int INACTIVE_EXPIRE_TIME = 60*5;
+    //If a thread costs more than 10 seconds to do a task, report to monitor center.
+    private static final int THREAD_BLOCK_TIME = 1000*10;
     private final String name;
     private final IExecutorHandler<T> handler;
     private FairPoolThread[] threads;
     private LinkedBlockingQueue<FairPoolUserQueue<T>> taskSchedule = new LinkedBlockingQueue<>();
     private ConcurrentHashMap<Object, FairPoolUserQueue<T>> userTasks = new ConcurrentHashMap<>();
+    private TimerTaskManager.RepeatedTimerTask clearTask;
+    private TimerTaskManager.RepeatedTimerTask threadMonitorTask;
     private volatile State state = State.NEW;
 
     /**
@@ -66,18 +79,59 @@ public class FairPoolExecutor<T> {
         }
     }
 
+    public String getName(){
+        return name;
+    }
+
     /**
      * Start the executor. Before put a task into the executor, you must start it.
      * @throws IllegalStateException Throws while the executor is already terminated
      */
     public void start() throws IllegalStateException {
-        if(state != State.NEW){
+        if (state != State.NEW) {
             throw new IllegalStateException("Executor terminated!");
         }
         state = State.RUNNABLE;
-        for(int i = 0;i<threads.length;i++){
+        for (int i = 0; i < threads.length; i++) {
             threads[i].start();
         }
+        initTimer();
+    }
+
+    private void initTimer(){
+        clearTask = TimerTaskManager.getInstance().newRepeatedTimeout(new Transaction(String.format("%sClearTask",name)) {
+            @Override
+            protected void process() {
+                Iterator<Map.Entry<Object,FairPoolUserQueue<T>>> iterator = userTasks.entrySet().iterator();
+                while(iterator.hasNext()){
+                    Map.Entry<Object,FairPoolUserQueue<T>> entry = iterator.next();
+                    if(entry.getValue().isIdle() && entry.getValue().getActiveTs()<System.currentTimeMillis() - INACTIVE_EXPIRE_TIME){
+                        iterator.remove();
+                    }
+                }
+            }
+            @Override
+            protected void failed() {
+            }
+        },INACTIVE_EXPIRE_TIME,INACTIVE_EXPIRE_TIME, TimeUnit.SECONDS,0);
+        threadMonitorTask = TimerTaskManager.getInstance().newRepeatedTimeout(new Transaction(String.format("%sThreadMonitor",name)) {
+            @Override
+            protected void process() {
+                long nowTs = System.currentTimeMillis();
+                for(int i = 0;i< threads.length;i++){
+                    FairPoolThread<T> workingThread = threads[i];
+                    if(workingThread.getRecentStartWork() > 0 && nowTs - workingThread.getRecentStartWork() > THREAD_BLOCK_TIME){
+                        ExecutorThreadBlocking report = new ExecutorThreadBlocking();
+                        report.setTime(nowTs);
+                        report.threadName = workingThread.getName();
+                        report.blockingTime = nowTs - workingThread.getRecentStartWork();
+                        MonitorCenter.INSTANCE.report(report);
+                    }
+                }
+            }
+            @Override
+            protected void failed() {}
+        }, THREAD_BLOCK_TIME, THREAD_BLOCK_TIME, TimeUnit.MILLISECONDS,0);
     }
 
     /**
@@ -90,6 +144,7 @@ public class FairPoolExecutor<T> {
             return;
         }
         state = State.TERMINATING;
+        clearTask.cancel();
         for(int i = 0;i<threads.length;i++){
             threads[i].interrupt();
         }
@@ -147,11 +202,7 @@ public class FairPoolExecutor<T> {
         if(state == State.TERMINATED){
             throw new IllegalStateException("Executor is terminated!");
         }
-        FairPoolUserQueue<T> userQueue = this.userTasks.get(id);
-        if(userQueue == null){
-            this.userTasks.putIfAbsent(id, new FairPoolUserQueue<>(id,this));
-            userQueue = this.userTasks.get(id);
-        }
+        FairPoolUserQueue<T> userQueue = this.userTasks.computeIfAbsent(id,key->new FairPoolUserQueue<>(key,this));
         userQueue.addWork(task);
     }
 
