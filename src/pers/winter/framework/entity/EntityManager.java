@@ -30,6 +30,7 @@ import pers.winter.framework.redis.RedisManager;
 import pers.winter.framework.utils.SnowFlakeIdGenerator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -92,16 +93,74 @@ public class EntityManager {
         return result;
     }
 
+    /**
+     * Query data by custom condition from MySQL.
+     * WARNING: the entities returned by this method cannot be saved directly.
+     * If user wants to save, call {@link #buildCache(long, Class)} first.
+     * @param sql the sql statement for query
+     * @param entityClass the class for the entity to be queried
+     * @return all entities match the condition
+     * @throws Exception while exception occurs.
+     */
     public <T extends AbstractBaseEntity> List<T> selectCustom(int dbID, String sql, Class<T> entityClass) throws Exception{
         List<T> entities = DatabaseCenter.INSTANCE.selectCustom(dbID, sql,entityClass);
         syncFromCache(entities, entityClass);
         return entities;
     }
 
+    /**
+     * Query data by custom condition from Mongodb.
+     * WARNING: the entities returned by this method cannot be saved directly.
+     * If user wants to save, call {@link #buildCache(long, Class)} first.
+     * @param queryBson the Bson for query
+     * @param entityClass the class for the entity to be queried
+     * @return all entities match the condition
+     * @throws Exception while exception occurs.
+     */
     public <T extends AbstractBaseEntity> List<T> selectCustom(Bson queryBson, Class<T> entityClass) throws Exception{
         List<T> entities = DatabaseCenter.INSTANCE.selectCustom(0, queryBson, entityClass);
         syncFromCache(entities, entityClass);
         return entities;
+    }
+
+    /**
+     * Build cache by the specific key.
+     * If a keyID is newly created or got by selectByCustom, this method must be called before save.
+     */
+    public <T extends AbstractBaseEntity> void buildCache(long key,Class<T> entityClass) throws Exception {
+        List<T> entities;
+        AnnTable annTable = entityClass.getAnnotation(AnnTable.class);
+        if(annTable.cacheType() == Constants.CacheType.MEMORY) {
+            entities = memoryCache.selectByKey(key, entityClass);
+        } else {
+            entities = redisCache.selectByKey(key,entityClass);
+        }
+        if(entities != null){
+            return;
+        }
+        if(annTable.cacheType() == Constants.CacheType.MEMORY) {
+            memoryCache.lockCache(key,entityClass);
+            try{
+                entities = memoryCache.selectByKey(key,entityClass);
+                if(entities == null){
+                    entities = DatabaseCenter.INSTANCE.selectByKey(key,entityClass);
+                    memoryCache.syncToCache(key,entities,entityClass);
+                }
+            } finally {
+                memoryCache.unlockCache(key,entityClass);
+            }
+        } else {
+            redisCache.lockCache(key,entityClass);
+            try{
+                entities = redisCache.selectByKey(key,entityClass);
+                if(entities == null){
+                    entities = DatabaseCenter.INSTANCE.selectByKey(key,entityClass);
+                    redisCache.syncToCache(key,entities,entityClass);
+                }
+            } finally {
+                redisCache.unlockCache(key,entityClass);
+            }
+        }
     }
 
     private <T extends AbstractBaseEntity> void syncFromCache(List<T> entities, Class<T> entityClass){
@@ -118,9 +177,25 @@ public class EntityManager {
         return DatabaseCenter.INSTANCE.getAllMySqlDbID();
     }
 
+    public void saveWithoutCache(Set<AbstractBaseEntity> entities) {
+        Set<AbstractBaseEntity> entitiesToSave = new HashSet<>();
+        for(AbstractBaseEntity entity:entities){
+            if(entity.getAction() == null){
+                logger.info("Action undefined for {}, data: {}",entity.getClass().getSimpleName(), JSON.toJSONString(entity));
+                continue;
+            }
+            if(entity.getAction() == Constants.Action.INSERT && entity.getId() == 0) {
+                entity.setId(SnowFlakeIdGenerator.generateId());
+            }
+            entitiesToSave.add(entity);
+        }
+        DatabaseCenter.INSTANCE.save(entitiesToSave);
+    }
+
     public boolean save(Set<AbstractBaseEntity> entities) {
         List<AbstractBaseEntity> entitiesInRedis = new ArrayList<>();
         List<AbstractBaseEntity> entitiesInMemory = new ArrayList<>();
+        Set<AbstractBaseEntity> entitiesToSave = new HashSet<>();
         for(AbstractBaseEntity entity:entities){
             if(entity.getAction() == null){
                 logger.info("Action undefined for {}, data: {}",entity.getClass().getSimpleName(), JSON.toJSONString(entity));
@@ -135,6 +210,7 @@ public class EntityManager {
             } else {
                 entitiesInMemory.add(entity);
             }
+            entitiesToSave.add(entity);
         }
         boolean memoryLocked = true;
         boolean redisLocked = true;
@@ -157,7 +233,7 @@ public class EntityManager {
                 logger.debug("Failed to check redis version.");
                 return false;
             }
-            for(AbstractBaseEntity entity:entities){
+            for(AbstractBaseEntity entity:entitiesToSave){
                 entity.modifyEntityVersion(entity.getEntityVersion() + 1);
             }
             if(!entitiesInMemory.isEmpty()){
@@ -166,7 +242,7 @@ public class EntityManager {
             if(!entitiesInRedis.isEmpty()){
                 redisCache.save(entitiesInRedis);
             }
-            DatabaseCenter.INSTANCE.save(entities);
+            DatabaseCenter.INSTANCE.save(entitiesToSave);
         } finally {
             if(memoryLocked && !entitiesInMemory.isEmpty()){
                 memoryCache.unlockEntities(entitiesInMemory);

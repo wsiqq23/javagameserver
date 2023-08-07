@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import pers.winter.framework.server.http.AnnHttpRequestMapping;
 import pers.winter.framework.server.http.AnnHttpRestController;
 import pers.winter.framework.server.http.HttpServerHandler;
+import pers.winter.framework.utils.HttpUtil;
 
 import java.util.Map;
 
@@ -31,14 +32,16 @@ import java.util.Map;
 public class DemoHttpService {
     private Logger logger = LogManager.getLogger(DemoHttpService.class);
     @AnnHttpRequestMapping(value = "/testGet", method = HttpServerHandler.HttpRequestMethod.GET)
-    public FullHttpResponse get(Map<String, String> parameters){
+    public FullHttpResponse get(FullHttpRequest request){
+        Map<String, ?> parameters = HttpUtil.getParametersFromGet(request);
         logger.info("Get data:{}",parameters);
         ByteBuf content = Unpooled.copiedBuffer("OK", CharsetUtil.UTF_8);
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK,content);
         return response;
     }
     @AnnHttpRequestMapping(value = "/testPost", method = HttpServerHandler.HttpRequestMethod.POST)
-    public FullHttpResponse post(byte[] data){
+    public FullHttpResponse post(FullHttpRequest request){
+        byte[] data = HttpUtil.getDataFromPost(request);
         logger.info("Post data:{}",new String(data));
         ByteBuf content = Unpooled.copiedBuffer("OK", CharsetUtil.UTF_8);
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK,content);

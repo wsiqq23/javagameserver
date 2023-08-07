@@ -15,9 +15,14 @@
  */
 package pers.winter.message.json;
 
+import com.alibaba.fastjson.JSON;
 import pers.winter.framework.message.AbstractBaseMessage;
 
 public class Bye extends AbstractBaseMessage {
     public String data1;
     public String data2;
+    @Override
+    public byte[] serialized() {
+        return JSON.toJSONString(this).getBytes();
+    }
 }

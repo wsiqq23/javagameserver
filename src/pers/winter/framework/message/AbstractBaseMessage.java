@@ -18,6 +18,7 @@ package pers.winter.framework.message;
 import com.alibaba.fastjson.annotation.JSONField;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import pers.winter.example.session.UserSession;
 
 /**
  * Parent class for all messages
@@ -25,12 +26,20 @@ import io.netty.channel.ChannelHandlerContext;
  */
 public abstract class AbstractBaseMessage {
     private transient ChannelHandlerContext context;
+    private transient UserSession session;
     public void setContext(ChannelHandlerContext context){
         this.context = context;
     }
     public ChannelHandlerContext getContext(){return this.context;}
+    public void setSession(UserSession session){
+        this.session = session;
+    }
+    public UserSession getSession(){
+        return this.session;
+    }
     @JSONField(serialize = false)
     public Channel getChannel(){
         return context!=null?context.channel():null;
     }
+    public abstract byte[] serialized();
 }

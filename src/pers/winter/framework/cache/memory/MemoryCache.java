@@ -47,18 +47,7 @@ public class MemoryCache {
     }
 
     @SuppressWarnings("unchecked")
-    private void buildOtherCaches(){
-        List<Class<?>> classes = ClassScanner.getTypesAnnotatedWith(AnnTable.class);
-        for(Class<?> cls:classes){
-            AnnTable annTable = cls.getAnnotation(AnnTable.class);
-            if(!annTable.userCache() && annTable.cacheType() == Constants.CacheType.MEMORY){
-                otherCaches.put((Class<? extends AbstractBaseEntity>) cls,Caffeine.newBuilder().expireAfterAccess(CACHE_EXPIRE_TIME, TimeUnit.SECONDS).build());
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends AbstractBaseEntity> List<T> selectByKey(long key, Class<T> entityClass) throws Exception{
+    public <T extends AbstractBaseEntity> List<T> selectByKey(long key, Class<T> entityClass){
         AnnTable annTable = entityClass.getAnnotation(AnnTable.class);
         CachedObject targetCache = null;
         if(annTable.userCache()){
@@ -78,6 +67,17 @@ public class MemoryCache {
             return result;
         }
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void buildOtherCaches(){
+        List<Class<?>> classes = ClassScanner.getTypesAnnotatedWith(AnnTable.class);
+        for(Class<?> cls:classes){
+            AnnTable annTable = cls.getAnnotation(AnnTable.class);
+            if(!annTable.userCache() && annTable.cacheType() == Constants.CacheType.MEMORY){
+                otherCaches.put((Class<? extends AbstractBaseEntity>) cls,Caffeine.newBuilder().expireAfterAccess(CACHE_EXPIRE_TIME, TimeUnit.SECONDS).build());
+            }
+        }
     }
 
     public void lockCache(long key, Class<? extends AbstractBaseEntity> entityClass){

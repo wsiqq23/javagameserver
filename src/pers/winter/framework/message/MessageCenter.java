@@ -16,8 +16,12 @@
 package pers.winter.framework.message;
 
 import com.alibaba.fastjson.JSON;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.util.Attribute;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pers.winter.example.Constants;
+import pers.winter.example.session.SessionContainer;
 import pers.winter.framework.config.ApplicationConfig;
 import pers.winter.framework.config.ConfigManager;
 import pers.winter.framework.config.MonitorConfig;
@@ -28,6 +32,8 @@ import pers.winter.framework.timer.TimerTaskManager;
 import pers.winter.message.json.ActionFail;
 import pers.winter.framework.threadpool.IExecutorHandler;
 import pers.winter.framework.utils.ClassScanner;
+import pers.winter.message.json.GenericResponse;
+import pers.winter.message.multiroles.login.Handshake;
 import pers.winter.monitor.ExecutorError;
 import pers.winter.monitor.MessageProcessSlow;
 import pers.winter.monitor.MessageTransactionFail;
@@ -162,8 +168,27 @@ public class MessageCenter {
      */
     public void receiveMessage(AbstractBaseMessage message){
         if(!terminated){
-            InetSocketAddress address = (InetSocketAddress) message.getChannel().remoteAddress();
-            executor.add(address.getAddress().getHostAddress(),message);
+            if(message.getClass() == Handshake.class){
+                InetSocketAddress address = (InetSocketAddress) message.getChannel().remoteAddress();
+                executor.add(address.getAddress().getHostAddress(),message);
+            } else {
+                Attribute<Boolean> verified = message.getChannel().attr(Constants.ATTRIBUTE_KEY_VERIFIED);
+                if(verified.get() == null){
+                    GenericResponse response = new GenericResponse();
+                    response.code = Constants.ResponseCodes.CONNECTION_NOT_VERIFIED.getValue();
+                    response.message = "Connection not verified!";
+                    message.getChannel().writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+                    return;
+                }
+                Attribute<Long> attrUid = message.getChannel().attr(Constants.ATTRIBUTE_KEY_USER_ID);
+                if(attrUid.get() != null){
+                    message.setSession(SessionContainer.getInstance().getSession(attrUid.get()));
+                    executor.add(attrUid.get(),message);
+                } else {
+                    InetSocketAddress address = (InetSocketAddress) message.getChannel().remoteAddress();
+                    executor.add(address.getAddress().getHostAddress(),message);
+                }
+            }
         }
     }
 

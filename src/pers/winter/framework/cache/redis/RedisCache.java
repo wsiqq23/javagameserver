@@ -59,7 +59,7 @@ public class RedisCache {
         LOCK_SCRIPT = new String(script);
     }
 
-    public <T extends AbstractBaseEntity> List<T> selectByKey(long keyID, Class<T> entityClass) throws Exception {
+    public <T extends AbstractBaseEntity> List<T> selectByKey(long keyID, Class<T> entityClass) {
         List<T> result = null;
         String redisKey = getRedisDataKey(keyID, entityClass);
         Map<String, String> redisResult;

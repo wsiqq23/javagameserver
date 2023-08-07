@@ -38,8 +38,9 @@ import java.util.Map;
 @ChannelHandler.Sharable
 public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     private Logger logger = LogManager.getLogger(HttpServerHandler.class);
-    private Map<String, HttpRequestHandler> handlers = new HashMap<>();
     public static final HttpServerHandler INSTANCE = new HttpServerHandler();
+
+    private Map<String, HttpRequestHandler> handlers = new HashMap<>();
     private HttpServerHandler(){}
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest){
@@ -53,14 +54,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         HttpRequestHandler handler = handlers.get(path);
         FullHttpResponse response;
         try {
-            if (handler.getRequestMethod() == HttpServerHandler.HttpRequestMethod.GET) {
-                response = (FullHttpResponse) handler.getMethodHandle().invoke(handler.getService(), decoder.parameters());
-            } else {
-                ByteBuf content = fullHttpRequest.content();
-                byte[] bytes = new byte[content.readableBytes()];
-                content.readBytes(bytes);
-                response= (FullHttpResponse) handler.getMethodHandle().invoke(handler.getService(), bytes);
-            }
+            response = (FullHttpResponse) handler.getMethodHandle().invoke(handler.getService(), fullHttpRequest);
             if(fullHttpRequest.headers().containsValue(HttpHeaderNames.CONNECTION,HttpHeaderValues.CLOSE,true)){
                 ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
             } else if(fullHttpRequest.headers().containsValue(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE, true)){
@@ -101,16 +95,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                         throw new Exception("The AnnHttpRequestMapping method must return a FullHttpResponse!");
                     }
                     AnnHttpRequestMapping requestMapping = method.getAnnotation(AnnHttpRequestMapping.class);
-                    if(requestMapping.method() == HttpServerHandler.HttpRequestMethod.GET){
-                        if(!Map.class.isAssignableFrom(method.getParameterTypes()[0])){
-                            logger.error("The method {}.{} accepts the GET requests but doesn't accept the parameter Map<String,List<String>>!",cls.getSimpleName(),method.getName());
-                            throw new Exception("Illegal parameter!");
-                        }
-                    } else {
-                        if(!byte[].class.isAssignableFrom(method.getParameterTypes()[0])){
-                            logger.error("The method {}.{} accepts the POST requests but doesn't accept the parameter byte[]!",cls.getSimpleName(),method.getName());
-                            throw new Exception("Illegal parameter!");
-                        }
+                    if(!FullHttpRequest.class.isAssignableFrom(method.getParameterTypes()[0])){
+                        logger.error("The method {}.{} doesn't accept the parameter FullHttpRequest!",cls.getSimpleName(),method.getName());
+                        throw new Exception("Illegal parameter!");
                     }
                     MethodHandle methodHandle = MethodHandles.publicLookup().unreflect(method);
                     handlers.put(requestMapping.value(), new HttpRequestHandler(serviceInstance,methodHandle,requestMapping.method()));

@@ -54,6 +54,11 @@ public abstract class Transaction implements Runnable{
             } while (!result && round++ < retryCount);
             if(!result){
                 failed();
+            } else {
+                Runnable successListener = ThreadCacheManager.INSTANCE.getCommitListener();
+                if(successListener != null){
+                    successListener.run();
+                }
             }
         } finally {
             ThreadCacheManager.INSTANCE.removeThread();
@@ -66,5 +71,9 @@ public abstract class Transaction implements Runnable{
             return EntityManager.INSTANCE.save(entitiesChanged);
         }
         return true;
+    }
+
+    public static void setCommitListener(Runnable listener){
+        ThreadCacheManager.INSTANCE.setCommitListener(listener);
     }
 }

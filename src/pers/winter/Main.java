@@ -15,6 +15,7 @@
  */
 package pers.winter;
 
+import pers.winter.example.sdk.SdkCenter;
 import pers.winter.framework.config.ConfigManager;
 import pers.winter.framework.entity.EntityManager;
 import pers.winter.framework.monitor.MonitorCenter;
@@ -30,6 +31,7 @@ public class Main {
         ConfigManager.INSTANCE.init();
         EntityManager.INSTANCE.init();
         MonitorCenter.INSTANCE.init();
+        SdkCenter.INSTANCE.init();
         ServerActor.INSTANCE.start();
         Runtime.getRuntime().addShutdownHook(new ShutdownHook());
     }

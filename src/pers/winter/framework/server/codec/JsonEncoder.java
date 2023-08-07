@@ -15,7 +15,6 @@
  */
 package pers.winter.framework.server.codec;
 
-import com.alibaba.fastjson.JSON;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,8 +31,7 @@ public class JsonEncoder extends MessageToByteEncoder<AbstractBaseMessage> {
     private JsonEncoder(){}
     @Override
     protected void encode(ChannelHandlerContext channelHandlerContext, AbstractBaseMessage message, ByteBuf byteBuf) throws Exception {
-        String json = JSON.toJSONString(message);
-        byte[] data = json.getBytes();
+        byte[] data = message.serialized();
         int length = Constants.ENCODE_HEADER_LENGTH + data.length;
         byteBuf.writeInt(length);
         byteBuf.writeByte(Constants.CODEC_JSON);

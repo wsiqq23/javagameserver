@@ -13,14 +13,23 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.message.json;
+package pers.winter.framework.utils;
 
-import com.alibaba.fastjson.JSON;
-import pers.winter.framework.message.AbstractBaseMessage;
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.http.*;
 
-public class ActionFail extends AbstractBaseMessage {
-    @Override
-    public byte[] serialized() {
-        return JSON.toJSONString(this).getBytes();
+import java.util.List;
+import java.util.Map;
+
+public class HttpUtil {
+    public static Map<String, List<String>> getParametersFromGet(FullHttpRequest request){
+        return new QueryStringDecoder(request.uri()).parameters();
+    }
+
+    public static byte[] getDataFromPost(FullHttpRequest request){
+        ByteBuf content = request.content();
+        byte[] bytes = new byte[content.readableBytes()];
+        content.readBytes(bytes);
+        return bytes;
     }
 }

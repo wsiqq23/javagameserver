@@ -18,8 +18,14 @@ package pers.winter.framework.server.codec;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import pers.winter.framework.message.AbstractBaseMessage;
+import pers.winter.message.json.ActionFail;
 import pers.winter.message.json.Bye;
+import pers.winter.message.json.GenericResponse;
 import pers.winter.message.json.Hello;
+import pers.winter.message.multiroles.login.Handshake;
+import pers.winter.message.multiroles.login.HandshakeResponse;
+import pers.winter.message.multiroles.login.RoleLogin;
+import pers.winter.message.multiroles.login.RoleLoginResponse;
 
 /**
  * A dictionary for json message id.
@@ -42,5 +48,11 @@ public class JsonMessageDictionary {
     static {
         DICTIONARY.put(1, Hello.class);
         DICTIONARY.put(2, Bye.class);
+        DICTIONARY.put(3, Handshake.class);
+        DICTIONARY.put(4, HandshakeResponse.class);
+        DICTIONARY.put(5, ActionFail.class);
+        DICTIONARY.put(6, GenericResponse.class);
+        DICTIONARY.put(7, RoleLogin.class);
+        DICTIONARY.put(8, RoleLoginResponse.class);
     }
 }

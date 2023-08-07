@@ -21,13 +21,22 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-@ChannelHandler.Sharable
-public class SocketClientHandler extends SimpleChannelInboundHandler {
+
+import java.util.function.Consumer;
+
+public class SocketClientHandler extends SimpleChannelInboundHandler<Object> {
     private final Logger logger = LogManager.getLogger(SocketClientHandler.class);
-    public static final SocketClientHandler INSTANCE = new SocketClientHandler();
-    private SocketClientHandler(){}
+    private final Consumer<Object> messageHandler;
+    public SocketClientHandler(Consumer<Object> messageHandler){this.messageHandler = messageHandler;}
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
         logger.info("Receive server message: {}",JSON.toJSONString(o));
+        if(messageHandler != null){
+            messageHandler.accept(o);
+        }
+    }
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        logger.error("Exception!",cause);
     }
 }

@@ -17,6 +17,7 @@ package pers.winter.test.socket.client;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
+import java.util.function.Consumer;
 
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.util.concurrent.DefaultThreadFactory;
@@ -49,7 +50,7 @@ public class SocketClient {
         this.ip = ip;
         this.port = port;
     }
-    public boolean connect() throws Exception {
+    public boolean connect(Consumer<Object> messageHandler) throws Exception {
         Bootstrap bootstrap = new Bootstrap();
         this.workerGroup = new NioEventLoopGroup(1, new DefaultThreadFactory("ClientWorkerGroup"));
         bootstrap.group(this.workerGroup);
@@ -62,7 +63,7 @@ public class SocketClient {
                 ch.pipeline().addLast(JsonEncoder.INSTANCE);
                 ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(ByteOrder.BIG_ENDIAN,Constants.MAX_PACKAGE_LENGTH,0,4,0,0,true));
                 ch.pipeline().addLast(new MessageDecoder());
-                ch.pipeline().addLast(SocketClientHandler.INSTANCE);
+                ch.pipeline().addLast(new SocketClientHandler(messageHandler));
             }
         });
         // 发起异步连接操作
@@ -86,14 +87,9 @@ public class SocketClient {
         log.info("Netty socket closed");
     }
 
-    public void reconnect() throws Exception {
-        this.disconnect();
-        this.connect();
-    }
-
     public static void main(String[] args) throws Exception {
         SocketClient client = new SocketClient("127.0.0.1",7001);
-        client.connect();
+        client.connect(null);
         Hello hello = new Hello();
         hello.time = System.currentTimeMillis();
         hello.data = "How are you?";

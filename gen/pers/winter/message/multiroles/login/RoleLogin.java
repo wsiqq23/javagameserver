@@ -13,12 +13,15 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.message.json;
+package pers.winter.message.multiroles.login;
 
 import com.alibaba.fastjson.JSON;
+import pers.winter.bean.CreateRoleBean;
 import pers.winter.framework.message.AbstractBaseMessage;
 
-public class ActionFail extends AbstractBaseMessage {
+public class RoleLogin extends AbstractBaseMessage {
+    public long roleID;
+    public CreateRoleBean createRoleBean;
     @Override
     public byte[] serialized() {
         return JSON.toJSONString(this).getBytes();

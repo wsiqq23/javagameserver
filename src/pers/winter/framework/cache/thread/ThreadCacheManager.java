@@ -115,4 +115,26 @@ public class ThreadCacheManager {
         }
         threadCache.clearCachedEntities();
     }
+
+    /**
+     * Sets the runnable runs after commit success
+     */
+    public void setCommitListener(Runnable listener){
+        ThreadCache threadCache = threadCaches.get(Thread.currentThread());
+        if(threadCache == null){
+            return;
+        }
+        threadCache.setCommitListener(listener);
+    }
+
+    /**
+     * Gets the runnable runs after commit success
+     */
+    public Runnable getCommitListener(){
+        ThreadCache threadCache = threadCaches.get(Thread.currentThread());
+        if(threadCache == null){
+            return null;
+        }
+        return threadCache.getCommitListener();
+    }
 }

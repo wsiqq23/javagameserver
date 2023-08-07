@@ -13,14 +13,17 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.message.json;
+package pers.winter.example.sdk;
 
-import com.alibaba.fastjson.JSON;
-import pers.winter.framework.message.AbstractBaseMessage;
+import io.netty.handler.codec.http.FullHttpRequest;
 
-public class ActionFail extends AbstractBaseMessage {
-    @Override
-    public byte[] serialized() {
-        return JSON.toJSONString(this).getBytes();
+public abstract class AbstractBaseSdk {
+    private final String channel;
+    public AbstractBaseSdk(String channel){
+        this.channel = channel;
     }
+    public String getChannel(){
+        return channel;
+    }
+    public abstract boolean login(FullHttpRequest request);
 }

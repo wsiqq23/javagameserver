@@ -13,14 +13,20 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.message.json;
+package pers.winter.example.config;
 
-import com.alibaba.fastjson.JSON;
-import pers.winter.framework.message.AbstractBaseMessage;
+import pers.winter.framework.config.AnnConfig;
 
-public class ActionFail extends AbstractBaseMessage {
-    @Override
-    public byte[] serialized() {
-        return JSON.toJSONString(this).getBytes();
+@AnnConfig(filePath = "config/game.properties")
+public class GameConfig {
+    private String signatureKey;
+    private int signatureValidTime;
+    private int sessionExpire;
+    public String getSignatureKey(){
+        return signatureKey;
     }
+    public int getSignatureValidTime(){
+        return signatureValidTime;
+    }
+    public int getSessionExpire(){return sessionExpire;}
 }

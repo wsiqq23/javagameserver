@@ -22,6 +22,7 @@ import pers.winter.framework.db.AbstractBaseEntity;
 import pers.winter.framework.db.AnnTable;
 import pers.winter.framework.db.Constants;
 import pers.winter.db.dao.StudentDao;
+import pers.winter.framework.utils.CloneUtil;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -145,7 +146,7 @@ public class Student extends AbstractBaseEntity {
         student.setName(getName());
         student.setBirthday(getBirthday());
         student.setDormitory(getDormitory());
-        student.setTranscript(getTranscript() == null?null:getTranscript().deepClone());
+        student.setTranscript(CloneUtil.deepClone(getTranscript()));
         return student;
     }
 }

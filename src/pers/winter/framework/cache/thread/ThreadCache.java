@@ -25,6 +25,7 @@ public class ThreadCache {
     private static final Logger logger = LogManager.getLogger(ThreadCache.class);
     private Map<Class<? extends AbstractBaseEntity>, Map<Long, List<? extends AbstractBaseEntity>>> cache = new HashMap<>();
     private Set<AbstractBaseEntity> entitiesChanged = new HashSet<>();
+    private Runnable commitListener;
     @SuppressWarnings("unchecked")
     public <T extends AbstractBaseEntity> List<T> selectByKey(long key, Class<T> entityClass) {
         if(cache.containsKey(entityClass)){
@@ -92,5 +93,11 @@ public class ThreadCache {
     public void clearCachedEntities(){
         cache.clear();
         entitiesChanged.clear();
+    }
+    public void setCommitListener(Runnable commitListener){
+        this.commitListener = commitListener;
+    }
+    public Runnable getCommitListener(){
+        return commitListener;
     }
 }
