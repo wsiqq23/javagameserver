@@ -7,3 +7,4 @@ logs/*
 classes/*
 MANIFEST.MF
 addLicense.py
+export/*

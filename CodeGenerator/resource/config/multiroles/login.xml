@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <bean class="pers.winter.bean.CreateRoleBean" comment="Information for role-creation from client">
+        <field type="String" name="name"/>
+        <field type="byte" name="job"/>
+        <field type="short" name="sex"/>
+        <field type="byte" name="race"/>
+    </bean>
+    <bean class="pers.winter.bean.SocketServer">
+        <field type="String" name="ip"/>
+        <field type="int" name="port"/>
+        <field type="String" name="name"/>
+    </bean>
+    <entity class="pers.winter.db.entity.Account" key="id" dbType="mongo" cacheType="memory" userCache="false">
+        <field type="String" name="channel"/>
+        <field type="String" name="platformId"/>
+        <field type="long" name="createTime"/>
+        <field type="long" name="recentRole"/>
+        <field type="long" name="recentLogin"/>
+    </entity>
+    <entity class="pers.winter.db.entity.Role" key="id" dbType="mysql" daoClass="pers.winter.db.dao.RoleDao" cacheType="memory" userCache="true">
+        <field type="long" dbType="bigint" name="accountId"/>
+        <field type="short" dbType="smallint" name="lv"/>
+        <field type="String" dbType="varchar(100)" name="name"/>
+        <field type="byte" dbType="tinyint" name="job"/>
+        <field type="short" dbType="smallint" name="sex"/>
+        <field type="byte" dbType="tinyint" name="race"/>
+        <field type="long" dbType="bigint" name="createTime"/>
+        <field type="long" dbType="bigint" name="recentLogin"/>ZZZ
+    </entity>
+    <message class="pers.winter.message.multiroles.login.Handshake" comment="The handshake request for the socket connection">
+        <field type="long" name="accountId" comment="Account uniqueID"/>
+        <field type="String" name="signature" comment="Login signature"/>
+        <field type="long" name="timestamp" comment="Htto login time"/>
+    </message>
+    <message class="pers.winter.message.multiroles.login.HandshakeResponse" comment="The response for the handshake request">
+        <field type="int" name="code" comment="Code for handshake result"/>
+        <field type="List&lt;pers.winter.db.entity.Role&gt;" name="roles" comment="Role in the connected server"/>
+    </message>
+    <message class="pers.winter.message.multiroles.login.RoleLogin">
+        <field type="long" name="roleID"/>
+        <field type="pers.winter.bean.CreateRoleBean" name="createRoleBean"/>
+    </message>
+    <message class="pers.winter.message.multiroles.login.RoleLoginResponse">
+        <field type="int" name="code"/>
+        <field type="long" name="roleID"/>
+    </message>
+    <message class="pers.winter.message.multiroles.login.LoginResponse">
+        <field type="int" name="code"/>
+        <field type="long" name="accountId"/>
+        <field type="long" name="timestamp"/>
+        <field type="String" name="signature"/>
+        <field type="pers.winter.bean.SocketServer" name="server"/>
+    </message>
+</root>

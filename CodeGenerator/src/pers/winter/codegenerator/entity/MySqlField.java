@@ -13,17 +13,19 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.message.multiroles.login;
+package pers.winter.codegenerator.entity;
 
-import com.alibaba.fastjson.JSON;
-import pers.winter.framework.message.AbstractBaseMessage;
+import pers.winter.codegenerator.field.Field;
 
-public class RoleLoginResponse extends AbstractBaseMessage {
-    public int code;
-    public long roleID;
-
-    @Override
-    public byte[] serialized() {
-        return JSON.toJSONString(this).getBytes();
+public class MySqlField extends Field {
+    private String dbType;
+    public MySqlField(String type, String name, String comment) {
+        super(type, name, comment);
+    }
+    public String getDbType(){
+        return this.dbType;
+    }
+    public void setDbType(String dbType){
+        this.dbType = dbType;
     }
 }

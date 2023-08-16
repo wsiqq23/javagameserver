@@ -13,17 +13,19 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.message.multiroles.login;
+package pers.winter.codegenerator.utils;
 
-import com.alibaba.fastjson.JSON;
-import pers.winter.framework.message.AbstractBaseMessage;
-
-public class RoleLoginResponse extends AbstractBaseMessage {
-    public int code;
-    public long roleID;
-
-    @Override
-    public byte[] serialized() {
-        return JSON.toJSONString(this).getBytes();
+public class FailureInfo {
+    private final String target;
+    private final Exception cause;
+    public FailureInfo(String name,Exception cause){
+        this.target = name;
+        this.cause = cause;
+    }
+    public String getTarget(){
+        return target;
+    }
+    public Exception getCause(){
+        return cause;
     }
 }

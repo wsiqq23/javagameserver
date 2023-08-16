@@ -18,9 +18,14 @@ package pers.winter.message.json;
 import com.alibaba.fastjson.JSON;
 import pers.winter.framework.message.AbstractBaseMessage;
 
+/**
+ * Demo message
+ * @author CodeGenerator
+ */
 public class Hello extends AbstractBaseMessage {
     public long time;
     public String data;
+
     @Override
     public byte[] serialized() {
         return JSON.toJSONString(this).getBytes();

@@ -36,7 +36,7 @@ public @interface AnnTable {
     /** Specifies the type of caching mechanism: memory or redis. */
     Constants.CacheType cacheType();
     /** Specifies the DAO (Data Access Object) class associated with the Entity. */
-    Class<? extends AbstractBaseDao> daoClass();
+    Class<? extends AbstractBaseDao> daoClass() default AbstractBaseDao.class;
     /**  Specifies the table is cached in the user cache. */
     boolean userCache();
 }

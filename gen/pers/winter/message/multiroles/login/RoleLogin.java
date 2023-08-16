@@ -22,6 +22,7 @@ import pers.winter.framework.message.AbstractBaseMessage;
 public class RoleLogin extends AbstractBaseMessage {
     public long roleID;
     public CreateRoleBean createRoleBean;
+
     @Override
     public byte[] serialized() {
         return JSON.toJSONString(this).getBytes();

@@ -21,6 +21,8 @@ import pers.winter.db.entity.Student;
 import pers.winter.framework.entity.EntityManager;
 import pers.winter.framework.entity.Transaction;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -34,6 +36,13 @@ public class TestSave {
             student.setDormitory(1);
             student.setName(Thread.currentThread().getName()+"Insert");
             student.setSex(i);
+            student.setShortList(List.of((short)1,(short)2,(short)3));
+            student.setTranscriptMap(new HashMap<>());
+            student.setTranscriptList(new ArrayList<>());
+            for(int j = 0;j<5;j++){
+                student.getTranscriptMap().put(String.valueOf(j),new Transcript());
+                student.getTranscriptList().add(new Transcript());
+            }
             student.insert();
         }
     }
@@ -48,6 +57,10 @@ public class TestSave {
             student.getTranscript().setChinese((short) 100);
             student.getTranscript().setMath((short) 100);
             student.getTranscript().setEnglish((short) 100);
+            for(short j = 0;j<5;j++){
+                student.getTranscriptMap().get(String.valueOf(j)).setMath(j);
+                student.getTranscriptList().get(j).setEnglish(j);
+            }
             student.update();
         }
     }
@@ -64,9 +77,9 @@ public class TestSave {
             @Override
             protected void process() {
                 try{
-                    testInsert();
+//                    testInsert();
                     testUpdate();
-                    testDelete();
+//                    testDelete();
                 } catch (Exception e){
                     e.printStackTrace();
                     System.exit(-1);
@@ -84,9 +97,19 @@ public class TestSave {
         EntityManager.INSTANCE.init();
         List<Student> students = EntityManager.INSTANCE.selectByKey(1,Student.class);
         if(students.isEmpty()) {
-            testInsert();
+            new Transaction("Insert"){
+                @Override
+                protected void process() {
+                    testInsert();
+                }
+                @Override
+                protected void failed() {
+
+                }
+            }.run();
+            Thread.sleep(1000);
         }
-        final int threadSize = 10;
+        final int threadSize = 1;
         CountDownLatch cd = new CountDownLatch(threadSize);
         for(int i = 0;i<threadSize;i++){
             Thread t = new Thread(()->{

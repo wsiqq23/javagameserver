@@ -1,34 +1,19 @@
-/*
- * Copyright 2023 Winter Game Server
- *
- * The Winter Game Server licenses this file to you under the Apache License,
- * version 2.0 (the "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at:
- *
- *   https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations
- * under the License.
- */
-package pers.winter.db.dao;
+package ${daoClass[0..(daoClass?last_index_of(".") - 1)]};
 
 import pers.winter.framework.db.AbstractBaseEntity;
-import pers.winter.db.entity.Role;
+import ${class};
 import pers.winter.framework.db.mysql.AbstractBaseDao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RoleDao extends AbstractBaseDao {
-    private static final String TABLE_NAME = "role";
-    private static final String KEY_NAME = "id";
+public class ${daoClass?split(".")?last} extends AbstractBaseDao {
+    private static final String TABLE_NAME = "${class?split(".")?last?lower_case}";
+    private static final String KEY_NAME = "${key}";
     @Override
     public boolean insert(Connection connection, AbstractBaseEntity entity) throws SQLException {
-        String sql = String.format(SQL_INSERT,TABLE_NAME,"(?,?,?,?,?,?,?,?,?,?)");
+        String sql = String.format(SQL_INSERT,TABLE_NAME,"(?,?<#list fields as field>,?</#list>)");
         PreparedStatement preparedStatement = null;
         try{
             preparedStatement = connection.prepareStatement(sql);
@@ -64,12 +49,12 @@ public class RoleDao extends AbstractBaseDao {
 
     @Override
     public boolean update(Connection connection, AbstractBaseEntity entity) throws SQLException {
-        String sql = String.format(SQL_UPDATE,TABLE_NAME,"id=?,entityVersion=?,accountId=?,lv=?,name=?,job=?,sex=?,race=?,createTime=?,recentLogin=? where id=?");
+        String sql = String.format(SQL_UPDATE,TABLE_NAME,"id=?,entityVersion=?<#list fields as field>,${field.name}=?</#list> where id=?");
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(sql);
             entity.toPreparedStatement(preparedStatement);
-            preparedStatement.setLong(11,entity.getId());
+            preparedStatement.setLong(${fields?size + 3},entity.getId());
             if (preparedStatement.executeUpdate() == 1) {
                 return true;
             }
@@ -82,17 +67,17 @@ public class RoleDao extends AbstractBaseDao {
     }
 
     @Override
-    public List<Role> selectByKey(Connection connection, long keyID) throws SQLException {
+    public List<${class?split(".")?last}> selectByKey(Connection connection, long keyID) throws SQLException {
         String sql = String.format(SQL_SELECT_BY_KEY,TABLE_NAME,KEY_NAME);
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        List<Role> entities = new ArrayList<>();
+        List<${class?split(".")?last}> entities = new ArrayList<>();
         try{
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setLong(1,keyID);
             resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                Role entity = new Role();
+                ${class?split(".")?last} entity = new ${class?split(".")?last}();
                 entity.fromResultSet(resultSet);
                 entities.add(entity);
             }
@@ -113,16 +98,11 @@ public class RoleDao extends AbstractBaseDao {
         sb.append("create table if not exists student(");
         sb.append("id bigint not null");
         sb.append(",entityVersion int comment 'Version of data'");
-        sb.append(",accountId bigint comment ''");
-        sb.append(",lv smallint comment ''");
-        sb.append(",name varchar(100) comment ''");
-        sb.append(",job tinyint comment ''");
-        sb.append(",sex smallint comment ''");
-        sb.append(",race tinyint comment ''");
-        sb.append(",createTime bigint comment ''");
-        sb.append(",recentLogin bigint comment ''");
+<#list fields as field>
+        sb.append(",${field.name} ${field.dbType} comment '${field.comment}'");
+</#list>
         sb.append(",primary key(id)");
-        sb.append(",key idindex0(id)");
+        sb.append(",key ${key}index0(${key})");
         sb.append(")");
         Statement statement = null;
         try{

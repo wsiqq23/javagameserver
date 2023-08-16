@@ -15,9 +15,49 @@
  */
 package pers.winter.bean;
 
-public class CreateRoleBean {
-    public String name;
-    public byte job;
-    public short sex;
-    public byte race;
+import pers.winter.framework.entity.ICloneable;
+
+/**
+ * Information for role-creation from client
+ * @author CodeGenerator
+ */
+public class CreateRoleBean implements ICloneable {
+    private String name;
+    private byte job;
+    private short sex;
+    private byte race;
+
+    public String getName(){
+        return name;
+    }
+    public void setName(String name){
+        this.name = name;
+    }
+    public byte getJob(){
+        return job;
+    }
+    public void setJob(byte job){
+        this.job = job;
+    }
+    public short getSex(){
+        return sex;
+    }
+    public void setSex(short sex){
+        this.sex = sex;
+    }
+    public byte getRace(){
+        return race;
+    }
+    public void setRace(byte race){
+        this.race = race;
+    }
+    @Override
+    public CreateRoleBean deepClone(){
+        CreateRoleBean createRoleBean = new CreateRoleBean();
+        createRoleBean.setName(this.getName());
+        createRoleBean.setJob(this.getJob());
+        createRoleBean.setSex(this.getSex());
+        createRoleBean.setRace(this.getRace());
+        return createRoleBean;
+    }
 }

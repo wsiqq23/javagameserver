@@ -23,13 +23,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
 public class StudentDao extends AbstractBaseDao {
     private static final String TABLE_NAME = "student";
     private static final String KEY_NAME = "dormitory";
     @Override
     public boolean insert(Connection connection, AbstractBaseEntity entity) throws SQLException {
-        String sql = String.format(SQL_INSERT,TABLE_NAME,"(?,?,?,?,?,?,?)");
+        String sql = String.format(SQL_INSERT,TABLE_NAME,"(?,?,?,?,?,?,?,?,?,?)");
         PreparedStatement preparedStatement = null;
         try{
             preparedStatement = connection.prepareStatement(sql);
@@ -65,7 +64,7 @@ public class StudentDao extends AbstractBaseDao {
 
     @Override
     public boolean update(Connection connection, AbstractBaseEntity entity) throws SQLException {
-        String sql = String.format(SQL_UPDATE,TABLE_NAME,"id=?,entityVersion=?,sex=?,name=?,birthday=?,dormitory=?,transcript=? where id=?");
+        String sql = String.format(SQL_UPDATE,TABLE_NAME,"id=?,entityVersion=?,sex=?,name=?,birthday=?,dormitory=?,transcript=?,transcriptMap=?,transcriptList=?,shortList=? where id=?");
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = connection.prepareStatement(sql);
@@ -116,9 +115,12 @@ public class StudentDao extends AbstractBaseDao {
         sb.append(",entityVersion int comment 'Version of data'");
         sb.append(",sex smallint comment 'sex of the student'");
         sb.append(",name varchar(200) comment 'name of the student'");
-        sb.append(",birthday bigint comment 'birth timestamp of the student'");
-        sb.append(",dormitory bigint comment 'dormitory id of the student'");
-        sb.append(",transcript json comment 'transcript of the student'");
+        sb.append(",birthday bigint comment 'timestamp of the birthday of the student'");
+        sb.append(",dormitory bigint comment ''");
+        sb.append(",transcript json comment ''");
+        sb.append(",transcriptMap json comment ''");
+        sb.append(",transcriptList json comment ''");
+        sb.append(",shortList json comment ''");
         sb.append(",primary key(id)");
         sb.append(",key dormitoryindex0(dormitory)");
         sb.append(")");

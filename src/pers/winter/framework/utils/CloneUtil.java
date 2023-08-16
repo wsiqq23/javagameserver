@@ -22,6 +22,7 @@ import pers.winter.framework.entity.ICloneable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CloneUtil {
@@ -37,7 +38,7 @@ public class CloneUtil {
             if(source instanceof ICloneable){
                 return (T) ((ICloneable)source).deepClone();
             }
-            if(source.getClass() == ArrayList.class){
+            if(List.class.isAssignableFrom(source.getClass())){
                 ArrayList<?> sourceList = (ArrayList<?>) source;
                 ArrayList<Object> clonedList = new ArrayList<>(sourceList.size());
                 for(Object value:((ArrayList<?>) source)){
@@ -45,7 +46,7 @@ public class CloneUtil {
                 }
                 return (T) clonedList;
             }
-            if(source.getClass() == HashMap.class){
+            if(Map.class.isAssignableFrom(source.getClass())){
                 HashMap<?,?> sourceMap = (HashMap<?, ?>) source;
                 HashMap<Object, Object> clonedMap = new HashMap<>(sourceMap.size());
                 for (Map.Entry<?,?> entry: sourceMap.entrySet()){

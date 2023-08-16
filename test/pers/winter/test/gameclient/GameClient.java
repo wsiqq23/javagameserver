@@ -56,7 +56,7 @@ public class GameClient {
         this.actionQueue.add(action);
     }
     private void socketHandshake(SocketServer socketServer,long timestamp,String signature) throws Exception {
-        socketClient = new SocketClient(socketServer.ip,socketServer.port);
+        socketClient = new SocketClient(socketServer.getIp(),socketServer.getPort());
         socketClient.connect(messageHandler);
         Handshake handshake = new Handshake();
         handshake.accountId = accountId;
@@ -73,10 +73,10 @@ public class GameClient {
                     RoleLogin roleLogin = new RoleLogin();
                     if (handshakeResponse.roles.isEmpty()) {
                         roleLogin.createRoleBean = new CreateRoleBean();
-                        roleLogin.createRoleBean.job = 1;
-                        roleLogin.createRoleBean.name = "Medivh";
-                        roleLogin.createRoleBean.race = 1;
-                        roleLogin.createRoleBean.sex = 1;
+                        roleLogin.createRoleBean.setJob((byte) 1);
+                        roleLogin.createRoleBean.setName("Medivh");
+                        roleLogin.createRoleBean.setRace((byte) 1);
+                        roleLogin.createRoleBean.setSex((short) 1);
                     } else {
                         roleLogin.roleID = handshakeResponse.roles.get(0).getId();
                     }

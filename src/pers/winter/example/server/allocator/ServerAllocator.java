@@ -38,9 +38,9 @@ public class ServerAllocator {
      */
     public static SocketServer allocateServer(Account account){
         SocketServer server = new SocketServer();
-        server.ip = "127.0.0.1";
-        server.port = ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getSocketPort();
-        server.name = "Karazhan";
+        server.setIp("127.0.0.1");
+        server.setPort(ConfigManager.INSTANCE.getConfig(ApplicationConfig.class).getSocketPort());
+        server.setName("Karazhan");
         return server;
     }
     /**

@@ -18,10 +18,24 @@ package pers.winter.message.multiroles.login;
 import com.alibaba.fastjson.JSON;
 import pers.winter.framework.message.AbstractBaseMessage;
 
+/**
+ * The handshake request for the socket connection
+ * @author CodeGenerator
+ */
 public class Handshake extends AbstractBaseMessage {
+    /**
+     * Account uniqueID
+     */
     public long accountId;
+    /**
+     * Login signature
+     */
     public String signature;
+    /**
+     * Htto login time
+     */
     public long timestamp;
+
     @Override
     public byte[] serialized() {
         return JSON.toJSONString(this).getBytes();

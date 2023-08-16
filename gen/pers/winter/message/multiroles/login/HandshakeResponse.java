@@ -16,14 +16,24 @@
 package pers.winter.message.multiroles.login;
 
 import com.alibaba.fastjson.JSON;
+import java.util.*;
 import pers.winter.db.entity.Role;
 import pers.winter.framework.message.AbstractBaseMessage;
 
-import java.util.List;
-
+/**
+ * The response for the handshake request
+ * @author CodeGenerator
+ */
 public class HandshakeResponse extends AbstractBaseMessage {
+    /**
+     * Code for handshake result
+     */
     public int code;
+    /**
+     * Role in the connected server
+     */
     public List<Role> roles;
+
     @Override
     public byte[] serialized() {
         return JSON.toJSONString(this).getBytes();

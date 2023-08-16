@@ -18,9 +18,20 @@ package pers.winter.message.json;
 import com.alibaba.fastjson.JSON;
 import pers.winter.framework.message.AbstractBaseMessage;
 
+/**
+ * Generic response
+ * @author CodeGenerator
+ */
 public class GenericResponse extends AbstractBaseMessage {
+    /**
+     * Code for the result.
+     */
     public int code;
+    /**
+     * Extra-message.
+     */
     public String message;
+
     @Override
     public byte[] serialized() {
         return JSON.toJSONString(this).getBytes();

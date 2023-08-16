@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <bean class="pers.winter.bean.Transcript" comment="Demo bean" inMongo="true">
+        <field type="short" name="math"/>
+        <field type="short" name="english"/>
+        <field type="short" name="chinese"/>
+    </bean>
+    <entity class="pers.winter.db.entity.Student" key="dormitory" dbType="mongo" cacheType="memory" userCache="true" comment="Demo entity">
+        <field type="short" name="sex" comment="sex of the student"/>
+        <field type="String" name="name" comment="name of the student"/>
+        <field type="long" name="birthday" comment="timestamp of the birthday of the student"/>
+        <field type="long" name="dormitory"/>
+        <field type="pers.winter.bean.Transcript" name="transcript"/>
+        <field type="Map&lt;String,pers.winter.bean.Transcript&gt;" name="transcriptMap"/>
+        <field type="List&lt;pers.winter.bean.Transcript&gt;" name="transcriptList"/>
+        <field type="List&lt;Short&gt;" name="shortList"/>
+    </entity>
+    <message class="pers.winter.message.json.ActionFail" comment="Save failure because of concurrent">
+    </message>
+    <message class="pers.winter.message.json.GenericResponse" comment="Generic response">
+        <field type="int" name="code" comment="Code for the result."/>
+        <field type="String" name="message" comment="Extra-message."/>
+    </message>
+    <message class="pers.winter.message.json.Hello" comment="Demo message">
+        <field type="long" name="time"/>
+        <field type="String" name="data"/>
+    </message>
+    <message class="pers.winter.message.json.Bye" comment="Demo message">
+        <field type="String" name="data1"/>
+        <field type="String" name="data2"/>
+    </message>
+</root>

@@ -36,10 +36,10 @@ public class RoleController {
         role.setCreateTime(now);
         role.setId(SnowFlakeIdGenerator.generateId());
         role.setAccountId(accountId);
-        role.setRace(createRoleBean.race);
-        role.setSex(createRoleBean.sex);
-        role.setJob(createRoleBean.job);
-        role.setName(createRoleBean.name);
+        role.setRace(createRoleBean.getRace());
+        role.setSex(createRoleBean.getSex());
+        role.setJob(createRoleBean.getJob());
+        role.setName(createRoleBean.getName());
         role.insert();
         EntityManager.INSTANCE.buildCache(role.getKeyID(),Role.class);;
         return role;

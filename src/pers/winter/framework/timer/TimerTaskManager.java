@@ -139,9 +139,12 @@ public class TimerTaskManager {
         @Override
         public void run(Timeout timeout) throws Exception {
             if(!isCanceled){
-                transaction.run();
-                if(!isCanceled && (maxRepeatTime == 0 || ++curRepeatedTime<maxRepeatTime)){
-                    setTimeout(TimerTaskManager.getInstance().hashedWheelTimer.newTimeout(this,delay,timeUnit));
+                try{
+                    transaction.run();
+                } finally {
+                    if(!isCanceled && (maxRepeatTime == 0 || ++curRepeatedTime<maxRepeatTime)){
+                        setTimeout(TimerTaskManager.getInstance().hashedWheelTimer.newTimeout(this,delay,timeUnit));
+                    }
                 }
             }
         }

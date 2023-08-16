@@ -25,6 +25,7 @@ public class LoginResponse extends AbstractBaseMessage {
     public long timestamp;
     public String signature;
     public SocketServer server;
+
     @Override
     public byte[] serialized() {
         return JSON.toJSONString(this).getBytes();
