@@ -21,17 +21,11 @@ import java.io.File;
 import java.util.List;
 
 public class Generator {
-    public static String EXPORT_DIR = "export";
-    public static String CONFIG_DIR = "config";
-    public static String TEMPLATE_PATH_ENTITY = "persistence/entity.ftl";
-    public static String TEMPLATE_PATH_DAO = "persistence/dao.ftl";
-    public static String TEMPLATE_PATH_MESSAGE = "message/message.ftl";
-    public static String TEMPLATE_PATH_BEAN = "bean/bean.ftl";
     public static void main(String[] args) throws InterruptedException {
-        File file = new File(EXPORT_DIR);
+        File file = new File(Constants.EXPORT_DIR);
         FileUtil.deleteFileRecursively(file);
         file.mkdir();
-        List<File> allXml = FileUtil.findAllXmlRecursively(CONFIG_DIR);
+        List<File> allXml = FileUtil.findAllFilesRecursively(Constants.CONFIG_DIR,"xml");
         Parser.INSTANCE.parse(allXml);
     }
 }

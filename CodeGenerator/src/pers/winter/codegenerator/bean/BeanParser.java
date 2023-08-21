@@ -17,6 +17,7 @@ package pers.winter.codegenerator.bean;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import pers.winter.codegenerator.Constants;
 import pers.winter.codegenerator.Generator;
 import pers.winter.codegenerator.field.Field;
 import pers.winter.codegenerator.utils.FreeMarkerUtil;
@@ -50,9 +51,11 @@ public class BeanParser {
         for(Field field:fields){
             if(field.getImport() != null){
                 imports.add(field.getImport());
+                imports.add("pers.winter.framework.utils.CloneUtil");
             }
             if(field.isList() || field.isMap()){
                 imports.add("java.util.*");
+                imports.add("pers.winter.framework.utils.CloneUtil");
             }
         }
         params.put("imports",imports);
@@ -61,7 +64,7 @@ public class BeanParser {
         String[] tmp = messageElement.getAttribute("class").split("\\.");
         String fileName = tmp[tmp.length - 1] + ".java";
         tmp[tmp.length - 1] = "";
-        String exportDir = Generator.EXPORT_DIR + File.separator + String.join(File.separator,tmp);
-        FreeMarkerUtil.generate(Generator.TEMPLATE_PATH_BEAN,exportDir,fileName,params);
+        String exportDir = Constants.EXPORT_DIR + File.separator + String.join(File.separator,tmp);
+        FreeMarkerUtil.generate(Constants.TEMPLATE_PATH_BEAN,exportDir,fileName,params);
     }
 }

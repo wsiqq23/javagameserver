@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package pers.winter.codegenerator.utils;
+package pers.winter.framework.utils;
 
 import java.io.File;
 import java.util.ArrayList;

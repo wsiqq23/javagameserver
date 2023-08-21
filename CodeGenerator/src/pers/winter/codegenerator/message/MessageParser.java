@@ -17,6 +17,7 @@ package pers.winter.codegenerator.message;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import pers.winter.codegenerator.Constants;
 import pers.winter.codegenerator.Generator;
 import pers.winter.codegenerator.field.Field;
 import pers.winter.codegenerator.utils.FreeMarkerUtil;
@@ -62,8 +63,8 @@ public class MessageParser {
         String[] tmp = messageElement.getAttribute("class").split("\\.");
         String fileName = tmp[tmp.length - 1] + ".java";
         tmp[tmp.length - 1] = "";
-        String exportDir = Generator.EXPORT_DIR + File.separator + String.join(File.separator,tmp);
-        FreeMarkerUtil.generate(Generator.TEMPLATE_PATH_MESSAGE,exportDir,fileName,params);
+        String exportDir = Constants.EXPORT_DIR + File.separator + String.join(File.separator,tmp);
+        FreeMarkerUtil.generate(Constants.TEMPLATE_PATH_MESSAGE,exportDir,fileName,params);
     }
 }
 

@@ -17,6 +17,7 @@ package pers.winter.codegenerator.entity;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import pers.winter.codegenerator.Constants;
 import pers.winter.codegenerator.Generator;
 import pers.winter.codegenerator.field.Field;
 import pers.winter.codegenerator.utils.FreeMarkerUtil;
@@ -67,8 +68,8 @@ public class EntityParser {
         String[] tmp = entityElement.getAttribute("class").split("\\.");
         String fileName = tmp[tmp.length - 1] + ".java";
         tmp[tmp.length - 1] = "";
-        String exportDir = Generator.EXPORT_DIR + File.separator + String.join(File.separator,tmp);
-        FreeMarkerUtil.generate(Generator.TEMPLATE_PATH_ENTITY,exportDir,fileName,params);
+        String exportDir = Constants.EXPORT_DIR + File.separator + String.join(File.separator,tmp);
+        FreeMarkerUtil.generate(Constants.TEMPLATE_PATH_ENTITY,exportDir,fileName,params);
     }
 
     private List<Field> generateFields(Element entityElement){
@@ -99,7 +100,7 @@ public class EntityParser {
         String[] tmp = entityElement.getAttribute("daoClass").split("\\.");
         String fileName = tmp[tmp.length - 1] + ".java";
         tmp[tmp.length - 1] = "";
-        String exportDir = Generator.EXPORT_DIR + File.separator + String.join(File.separator,tmp);
-        FreeMarkerUtil.generate(Generator.TEMPLATE_PATH_DAO,exportDir,fileName,params);
+        String exportDir = Constants.EXPORT_DIR + File.separator + String.join(File.separator,tmp);
+        FreeMarkerUtil.generate(Constants.TEMPLATE_PATH_DAO,exportDir,fileName,params);
     }
 }
