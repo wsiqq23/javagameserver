@@ -41,6 +41,7 @@ import pers.winter.monitor.ExecutorQueueOverflow;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
@@ -106,7 +107,9 @@ public class MessageCenter {
                             retryCount = annMethod.retryCount();
                         }
                         MethodHandle methodHandle = MethodHandles.publicLookup().unreflect(method);
-                        messageHandlers.put(parameterCls,new MessageHandler(handler,methodHandle,retryCount));
+                        MethodHandle genericHandle = methodHandle.asType(MethodType.methodType(methodHandle.type().returnType(),List.of(Object.class,AbstractBaseMessage.class)));
+                        genericHandle.bindTo(handler);
+                        messageHandlers.put(parameterCls,new MessageHandler(handler,genericHandle,retryCount));
                     }
                 }
             }
@@ -202,7 +205,7 @@ public class MessageCenter {
         protected void process() {
             long st = System.currentTimeMillis();
             try{
-                handler.getMethodHandle().invoke(handler.getService(),message);
+                handler.getMethodHandle().invokeExact(handler.getService(),message);
             } catch (Throwable cause){
                 logger.error("Execute message {} exception! Data: {}.", message.getClass().getSimpleName(), JSON.toJSONString(message),cause);
                 ExecutorError report = new ExecutorError();
